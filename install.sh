@@ -1,3 +1,9 @@
+# Install raylib
+if [ ! -d ./raylib/raylib/src ]; then
+	git clone https://github.com/raysan5/raylib.git ./raylib/raylib
+	make -C ./raylib/raylib/src PLATFORM=PLATFORM_DESKTOP
+fi
+
 # Install SFML
 brew install sfml
 
@@ -6,11 +12,6 @@ brew install sdl2
 
 # In case we want to write stuff in the game this is the lib for sdl2
 # brew install sdl2_ttf 
-
-if [ ! -d ./raylib/raylib/src ]; then
-	git clone https://github.com/raysan5/raylib.git ./raylib/raylib
-	make -C ./raylib/raylib/src PLATFORM=PLATFORM_DESKTOP
-fi
 
 # Need to modify for 42 Mac
 path=/opt/homebrew/Cellar
