@@ -10,7 +10,7 @@ brew install sfml
 # Install SDL2
 brew install sdl2
 
-# In case we want to write stuff in the game this is the lib for sdl2
+# In case we want to write stuff in the game with sdl2 we need this lib
 # brew install sdl2_ttf 
 
 # Need to modify for 42 Mac
