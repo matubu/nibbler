@@ -21,7 +21,7 @@ void createWindow(const GameData *data) {
 		data->height * GameData::TILE_SIZE, 0);
 
 	// Create renderer	
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 }
 
 void draw(const GameData *data) {
