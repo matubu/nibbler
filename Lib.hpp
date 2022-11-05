@@ -67,7 +67,6 @@ struct Lib {
 		this->getEvents = NULL;
 		this->closeWindow = NULL;
 	}
-
 };
 
 const string Lib::LIB1 = "./sfml/libsfml.so";
