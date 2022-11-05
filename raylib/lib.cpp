@@ -8,7 +8,6 @@ extern "C" {
 #endif
 
 void createWindow(const GameData *data) {
-
 	InitWindow(data->width * GameData::TILE_SIZE,
 				data->height * GameData::TILE_SIZE,
 				"Nibbler - RAYLIB");

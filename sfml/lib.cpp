@@ -28,29 +28,29 @@ void draw(const GameData *data) {
 
 	sf::RectangleShape rectangle(sf::Vector2f(GameData::TILE_SIZE, GameData::TILE_SIZE));
 
-	for (u64 y = 0; y < data->height; ++y) {
-		for (u64 x = 0; x < data->width; ++x) {
-			rectangle.setPosition(x * GameData::TILE_SIZE, y * GameData::TILE_SIZE);
-
-			switch (data->getTile(x, y)) {
-				case GameData::SNAKE_HEAD:
-					rectangle.setFillColor(sf::Color::Magenta);
-					window->draw(rectangle);
-					break;
-				case GameData::SNAKE_BODY:
-					rectangle.setFillColor(sf::Color::Blue);
-					window->draw(rectangle);
-					break;
-				case GameData::SNAKE_TAIL:
-					rectangle.setFillColor(sf::Color::Cyan);
-					window->draw(rectangle);
-					break;
-				case GameData::FOOD:
-					rectangle.setFillColor(sf::Color::Green);
-					window->draw(rectangle);
-					break;
-			}
+	for (int i = 0; i < data->snake.size(); i++) {
+		rectangle.setPosition(
+			data->snake[i].first * GameData::TILE_SIZE,
+			data->snake[i].second * GameData::TILE_SIZE
+		);
+		if (i == 0) {
+			rectangle.setFillColor(sf::Color::Magenta);
+		} else if (i == data->snake.size() - 1) {
+			rectangle.setFillColor(sf::Color::Cyan);
+		} else {
+			rectangle.setFillColor(sf::Color::Blue);
 		}
+		window->draw(rectangle);
+	}
+
+	sf::CircleShape circle(GameData::TILE_SIZE / 2);
+	for (auto food : data->food) {
+		circle.setPosition(
+			food.first * GameData::TILE_SIZE,
+			food.second * GameData::TILE_SIZE
+		);
+		circle.setFillColor(sf::Color::Red);
+		window->draw(circle);
 	}
 
 	window->display();

@@ -86,10 +86,10 @@ void closeWindow() {
 	if (!window)
 		return ;
 	SDL_DestroyRenderer(renderer);
- 
-    SDL_DestroyWindow(window);
-     
-    SDL_Quit();
+
+	SDL_DestroyWindow(window);
+
+	SDL_Quit();
 }
 
 #ifdef __cplusplus
