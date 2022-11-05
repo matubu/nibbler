@@ -27,7 +27,7 @@ struct Lib {
 	Lib(string path, GameData *data) {
 		this->load(path, data);
 	}
-	
+
 	void switchLib(string path, GameData *data) {
 		this->unload();
 		this->load(path, data);
@@ -70,6 +70,6 @@ struct Lib {
 
 };
 
-const string Lib::LIB1 = "./libsfml.so";
-const string Lib::LIB2 = "./libraylib.so";
-const string Lib::LIB3 = "./libsdl2.so";
+const string Lib::LIB1 = "./sfml/libsfml.so";
+const string Lib::LIB2 = "./raylib/libraylib.so";
+const string Lib::LIB3 = "./sdl2/libsdl2.so";

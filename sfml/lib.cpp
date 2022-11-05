@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-#include "GameData.hpp"
+#include "../GameData.hpp"
 
 sf::RenderWindow *window = NULL;
 
