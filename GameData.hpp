@@ -58,8 +58,8 @@ bool contains(const vector<T> &vec, Vec2 pair) {
 }
 
 struct GameData {
-	static const u64 TILE_SIZE = 30;
-	static const u64 MOVE_PER_SEC = 15;
+	static const u64 TILE_SIZE = 10;
+	static const u64 MOVE_PER_SEC = 1000;
 
 	u64 width;
 	u64 height;
@@ -146,6 +146,8 @@ struct GameData {
 		}
 
 		bool eat = contains(this->food, Vec2(newX, newY));
+		this->snake.insert(this->snake.begin(), SnakePart(newX, newY, eat));
+
 		if (eat) {
 			this->food.erase(this->food.begin());
 			this->spawnFood();
@@ -154,8 +156,6 @@ struct GameData {
 		} else {
 			this->snake.pop_back();
 		}
-
-		this->snake.insert(this->snake.begin(), SnakePart(newX, newY, eat));
 	}
 
 	void changeDirection(i64 x, i64 y) {

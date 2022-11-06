@@ -1,10 +1,10 @@
 #include "Lib.hpp"
 
 int main() {
-	GameData data(30, 30);
+	GameData data(80, 80);
 	Lib lib(Lib::LIB1, &data);
 
-	int				lastUpdate = 0;
+	int				nextUpdate = 0;
 
 	while (1) {
 		for (auto event : lib.getEvents(&data)) {
@@ -40,9 +40,9 @@ int main() {
 			}
 		}
 
-		if (clock() > lastUpdate) {
+		if (clock() > nextUpdate) {
 			data.updateSnake();
-			lastUpdate = clock() + CLOCKS_PER_SEC / GameData::MOVE_PER_SEC;
+			nextUpdate = clock() + CLOCKS_PER_SEC / GameData::MOVE_PER_SEC;
 		}
 
 		lib.draw(&data);

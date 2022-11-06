@@ -116,6 +116,8 @@ void createWindow(const GameData *data) {
 	if (!font.loadFromFile("sfml/fonts/SigmarOne-Regular.ttf")) {
 		die("failed to load font");
 	}
+
+	autoMode = string(getenv("USER")) == "u";
 }
 
 void draw_snake(const GameData *data) {
