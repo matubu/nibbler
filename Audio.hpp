@@ -1,7 +1,7 @@
 #include <iostream>
 
 struct Audio {
-	void *audio;
+	void	*audio;
 
 	Audio(const std::string &path);
 	void	play() const;

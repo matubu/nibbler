@@ -1,7 +1,8 @@
 #include "Lib.hpp"
 
-int main() {
-	GameData data(20, 20);
+int main(int ac, char **av) {
+
+	GameData data(ac, av);
 	Lib lib(Lib::LIB1, &data);
 
 	int				nextUpdate = 0;
@@ -11,16 +12,28 @@ int main() {
 			// Handle event
 			switch (event.type) {
 				case Event::UP:
-					data.changeDirection(0, -1);
+					data.changeDirection(0, -1, false);
 					break;
 				case Event::DOWN:
-					data.changeDirection(0, 1);
+					data.changeDirection(0, 1, false);
 					break;
 				case Event::LEFT:
-					data.changeDirection(-1, 0);
+					data.changeDirection(-1, 0, false);
 					break;
 				case Event::RIGHT:
-					data.changeDirection(1, 0);
+					data.changeDirection(1, 0, false);
+					break;
+				case Event::ARR_UP:
+					data.changeDirection(0, -1, true);
+					break;
+				case Event::ARR_DOWN:
+					data.changeDirection(0, 1, true);
+					break;
+				case Event::ARR_LEFT:
+					data.changeDirection(-1, 0, true);
+					break;
+				case Event::ARR_RIGHT:
+					data.changeDirection(1, 0, true);
 					break;
 				case Event::SPEED_UP:
 					data.speed++;
@@ -48,7 +61,10 @@ int main() {
 		}
 
 		if (clock() > nextUpdate) {
-			data.updateSnake();
+			data.updateSnake(false);
+			// Not working
+			if (data.multiplayer)
+				data.updateSnake(true);
 			nextUpdate = clock() + CLOCKS_PER_SEC / data.speed;
 		}
 		lib.draw(&data);

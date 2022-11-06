@@ -103,42 +103,42 @@ void createWindow(const GameData *data) {
 	}
 }
 
-void draw_snake(const GameData *data) {
-	for (int i = 0; i < data->snake.size(); i++) {
-		i64 x = data->snake[i].x;
-		i64 y = data->snake[i].y;
+void draw_snake(const GameData *data, vector<SnakePart> snake, bool gameOver) {
+	for (int i = 0; i < snake.size(); i++) {
+		i64 x = snake[i].x;
+		i64 y = snake[i].y;
 		i64 rot = 0;
 		string texture;
 
 		// Find the right texture and rotation
 		if (i == 0) {
-			rot = get_snake_tile_orientation(data->snake[i], data->snake[i + 1]);
+			rot = get_snake_tile_orientation(snake[i], snake[i + 1]);
 			texture = "head";
-		} else if (i == data->snake.size() - 1) {
-			rot = get_snake_tile_orientation(data->snake[i - 1], data->snake[i]);
+		} else if (i == snake.size() - 1) {
+			rot = get_snake_tile_orientation(snake[i - 1], snake[i]);
 			texture = "tail";
 		} else {
-			if (data->snake[i - 1].x == data->snake[i + 1].x
-				|| data->snake[i - 1].y == data->snake[i + 1].y) {
+			if (snake[i - 1].x == snake[i + 1].x
+				|| snake[i - 1].y == snake[i + 1].y) {
 				rot = get_snake_tile_orientation(
-					data->snake[i - 1],
-					data->snake[i]
+					snake[i - 1],
+					snake[i]
 				);
 				texture = "body_straight";
 			} else {
 				rot = get_snake_tile_orientation(
-					data->snake[i - 1],
-					data->snake[i],
-					data->snake[i + 1]
+					snake[i - 1],
+					snake[i],
+					snake[i + 1]
 				);
 				texture = "body_turn";
 			}
 		}
 
-		if (data->gameOver && texture == "head") {
+		if (gameOver && texture == "head") {
 			texture += "_dead";
 		}
-		else if (data->snake[i].isEating) {
+		else if (snake[i].isEating) {
 			texture += "_eating";
 		}
 		drawSprite(data, x, y, rot, texture);
@@ -152,7 +152,9 @@ void draw(const GameData *data) {
 
 	window->clear(sf::Color(0x0E183D00));
 
-	draw_snake(data);
+	draw_snake(data, data->snake, data->gameOver);
+	if (data->multiplayer)
+		draw_snake(data, data->snake2, data->gameOver);
 
 	drawSprite(data, data->food.x, data->food.y, 0,
 			getFoodTexture(data->food.x, data->food.y));
@@ -219,18 +221,26 @@ vector<Event> getEvents(const GameData *data) {
 				// Handle key presses
 				switch (event.key.code) {
 					case sf::Keyboard::Up:
+						events.push_back(Event(Event::ARR_UP));
+						break;
 					case sf::Keyboard::W:
 						events.push_back(Event(Event::UP));
 						break;
 					case sf::Keyboard::Down:
+						events.push_back(Event(Event::ARR_DOWN));
+						break;
 					case sf::Keyboard::S:
 						events.push_back(Event(Event::DOWN));
 						break;
 					case sf::Keyboard::Left:
+						events.push_back(Event(Event::ARR_LEFT));
+						break;
 					case sf::Keyboard::A:
 						events.push_back(Event(Event::LEFT));
 						break;
 					case sf::Keyboard::Right:
+						events.push_back(Event(Event::ARR_RIGHT));
+						break;
 					case sf::Keyboard::D:
 						events.push_back(Event(Event::RIGHT));
 						break;

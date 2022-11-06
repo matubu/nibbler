@@ -4,11 +4,10 @@ LIBFLAG = -lsfml-audio -L./sfml/lib
 CPPFLAGS = -std=c++17 -O3 -I./sfml/include
 
 all:
-# make -C ./raylib
-# make -C ./sdl2
+	make -C ./raylib
+	make -C ./sdl2
 	make -C ./sfml
 	g++ $(CPPFLAGS) main.cpp Audio.cpp -o $(Name) $(LIBFLAG)
-	ALSOFT_LOGLEVEL=0 ./nibbler
 
 fclean:
 	rm -f ./raylib/libraylib.so
