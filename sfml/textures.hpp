@@ -9,6 +9,8 @@ map<string, sf::Texture> *textures;
 vector<string> texturesPacks{"blue", "orange", "green"};
 u64 currentTexturePack = 0;
 
+u64 nbFoodVariants = 5;
+
 void loadTexture(const string &name) {
 	string path = "sfml/assets/" + name + ".png";
 
@@ -25,6 +27,11 @@ void loadTextureFromPack(const string &name) {
 	}
 }
 
+const string getFoodTexture(i64 x, i64 y) {
+	srand(x << 16 | y);
+	return "food-" + std::to_string(rand() % nbFoodVariants);
+}
+
 void loadAllTextures() {
 	loadTextureFromPack("head");
 	loadTextureFromPack("body_straight");
@@ -35,6 +42,8 @@ void loadAllTextures() {
 	loadTextureFromPack("body_turn_eating");
 	loadTextureFromPack("tail_eating");
 	loadTextureFromPack("head_dead");
-	loadTexture("food");
+	for (u64 i = 0; i < nbFoodVariants; i++) {
+		loadTexture("food-" + std::to_string(i));
+	}
 	loadTexture("death_overlay");
 }

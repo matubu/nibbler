@@ -154,7 +154,8 @@ void draw(const GameData *data) {
 
 	draw_snake(data);
 
-	drawSprite(data, data->food.x, data->food.y, 0, "food");
+	drawSprite(data, data->food.x, data->food.y, 0,
+			getFoodTexture(data->food.x, data->food.y));
 
 	sf::Text text;
 	text.setFont(font);
