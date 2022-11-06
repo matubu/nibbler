@@ -2,7 +2,7 @@
 #include <map>
 
 #include "../GameData.hpp"
-#include "feature.hpp"
+#include "bot.hpp"
 
 using std::map;
 
@@ -181,6 +181,7 @@ void draw(const GameData *data) {
 	text.setFont(font);
 	text.setString("Score: " + std::to_string(data->snake.size())
 		+ (useBot ? "\n[B] Disable bot" : "\n[B] Enable bot")
+		+ "\n[+/-] Speed: " + std::to_string(data->speed)
 	);
 	text.setCharacterSize(TEXT_FONT_SIZE);
 	text.setFillColor(sf::Color::White);
@@ -254,6 +255,12 @@ vector<Event> getEvents(const GameData *data) {
 						break;
 					case sf::Keyboard::B:
 						useBot = !useBot;
+						break;
+					case sf::Keyboard::Add:
+						events.push_back(Event(Event::SPEED_UP));
+						break;
+					case sf::Keyboard::Subtract:
+						events.push_back(Event(Event::SPEED_DOWN));
 						break;
 					case sf::Keyboard::R:
 						events.push_back(Event(Event::RESET));

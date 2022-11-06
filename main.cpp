@@ -22,6 +22,13 @@ int main() {
 				case Event::RIGHT:
 					data.changeDirection(1, 0);
 					break;
+				case Event::SPEED_UP:
+					data.speed++;
+					break;
+				case Event::SPEED_DOWN:
+					if (data.speed > 1)
+						data.speed--;
+					break;
 				case Event::RESET:
 					data.reset();
 					break;
@@ -42,7 +49,7 @@ int main() {
 
 		if (clock() > nextUpdate) {
 			data.updateSnake();
-			nextUpdate = clock() + CLOCKS_PER_SEC / GameData::MOVE_PER_SEC;
+			nextUpdate = clock() + CLOCKS_PER_SEC / data.speed;
 		}
 
 		lib.draw(&data);

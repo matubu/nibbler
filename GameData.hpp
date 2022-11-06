@@ -59,10 +59,10 @@ bool contains(const vector<T> &vec, Vec2 pair) {
 
 struct GameData {
 	static const u64 TILE_SIZE = 30;
-	static const u64 MOVE_PER_SEC = 15;
 
 	u64 width;
 	u64 height;
+	u64 speed;
 
 	bool gameOver;
 	vector<SnakePart> snake;
@@ -80,6 +80,7 @@ struct GameData {
 
 		this->width = width;
 		this->height = height;
+		this->speed = 30;
 
 		this->loadSound(this->ambient_music_audio, "./sounds/ambient_music.wav");
 		this->loadSound(this->apple_bit_audio, "./sounds/apple_bit.wav");

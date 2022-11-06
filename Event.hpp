@@ -6,6 +6,8 @@ struct Event {
 		DOWN,
 		LEFT,
 		RIGHT,
+		SPEED_UP,
+		SPEED_DOWN,
 		RESET,
 		LIB1,
 		LIB2,

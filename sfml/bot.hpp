@@ -9,12 +9,14 @@
 struct BfsNode {
 	Vec2 pos;
 	u64 dist;
+	u64 score;
 	u64 depth;
 
 	BfsNode() {}
 	BfsNode(Vec2 pos, Vec2 goal, u64 depth = 0)
 		: pos(pos), depth(depth) {
 		dist = abs(pos.x - goal.x) + abs(pos.y - goal.y);
+		score = dist + rand() % 3;
 	}
 };
 
@@ -23,7 +25,7 @@ struct BfsComparator {
 
 	bool operator()(const BfsNode &a, const BfsNode &b)
 	{
-		return a.dist > b.dist;
+		return a.score > b.score;
 	}
 };
 
@@ -31,6 +33,7 @@ typedef std::priority_queue<BfsNode, std::vector<BfsNode>, BfsComparator> BfsQue
 
 void bfs_add(
 	const GameData *data,
+	Vec2 goal,
 	BfsQueue &queue,
 	std::map<Vec2, BfsNode> &parent,
 	Vec2 pos,
@@ -53,10 +56,10 @@ void bfs_add(
 	}
 
 	parent[pos] = parentNode;
-	queue.push(BfsNode(pos, data->food[0], parentNode.depth + 1));
+	queue.push(BfsNode(pos, goal, parentNode.depth + 1));
 }
 
-Vec2 bfs(const GameData *data) {
+Vec2 bfs(const GameData *data, const Vec2 &goal) {
 	BfsQueue queue;
 	std::map<Vec2, BfsNode> parent;
 
@@ -66,7 +69,7 @@ Vec2 bfs(const GameData *data) {
 		BfsNode pos = queue.top();
 		queue.pop();
 
-		if (contains(data->food, pos.pos)) {
+		if (pos.dist == 0) {
 			Vec2 it = pos.pos;
 			Vec2 tmp;
 			while (data->snake[0] != (tmp = parent[it].pos)) {
@@ -75,12 +78,13 @@ Vec2 bfs(const GameData *data) {
 			return it;
 		}
 
-		bfs_add(data, queue, parent, Vec2(pos.pos.x + 1, pos.pos.y), pos);
-		bfs_add(data, queue, parent, Vec2(pos.pos.x - 1, pos.pos.y), pos);
-		bfs_add(data, queue, parent, Vec2(pos.pos.x, pos.pos.y + 1), pos);
-		bfs_add(data, queue, parent, Vec2(pos.pos.x, pos.pos.y - 1), pos);
+		bfs_add(data, goal, queue, parent, Vec2(pos.pos.x + 1, pos.pos.y), pos);
+		bfs_add(data, goal, queue, parent, Vec2(pos.pos.x - 1, pos.pos.y), pos);
+		bfs_add(data, goal, queue, parent, Vec2(pos.pos.x, pos.pos.y + 1), pos);
+		bfs_add(data, goal, queue, parent, Vec2(pos.pos.x, pos.pos.y - 1), pos);
 	}
 
+	std::cout << "No solution" << std::endl;
 	return data->snake[0];
 }
 
@@ -89,7 +93,11 @@ void smartMove(const GameData *data, vector<Event> &events) {
 	static Vec2 lastPos = data->snake[0];
 
 	if (data->snake[0] != lastPos) {
-		next = bfs(data);
+		if (data->snake.size() > 50) {
+			next = bfs(data, data->snake[0]);
+		} else {
+			next = bfs(data, data->food[0]);
+		}
 		lastPos = data->snake[0];
 
 		if (next.x > data->snake[0].x) {
