@@ -7,7 +7,7 @@ int main() {
 	int				lastUpdate = 0;
 
 	while (1) {
-		for (auto event : lib.getEvents()) {
+		for (auto event : lib.getEvents(&data)) {
 			// Handle event
 			switch (event.type) {
 				case Event::UP:
@@ -21,6 +21,9 @@ int main() {
 					break;
 				case Event::RIGHT:
 					data.changeDirection(1, 0);
+					break;
+				case Event::RESET:
+					data.reset();
 					break;
 				case Event::LIB1:
 					lib.switchLib(Lib::LIB1, &data);

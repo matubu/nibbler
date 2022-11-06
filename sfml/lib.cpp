@@ -1,8 +1,8 @@
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include <map>
 
 #include "../GameData.hpp"
+#include "feature.hpp"
 
 using std::map;
 
@@ -12,6 +12,8 @@ sf::Sprite *sprite;
 map<string, sf::Texture> *textures;
 
 sf::Font font;
+
+bool autoMode = false;
 
 void loadTexture(const string &name) {
 	string path = "sfml/assets/" + name + ".png";
@@ -182,7 +184,7 @@ void draw(const GameData *data) {
 	window->display();
 }
 
-vector<Event> getEvents() {
+vector<Event> getEvents(const GameData *data) {
 	if (!window) {
 		return vector<Event>();
 	}
@@ -218,6 +220,11 @@ vector<Event> getEvents() {
 					case sf::Keyboard::D:
 						events.push_back(Event(Event::RIGHT));
 						break;
+					case sf::Keyboard::U:
+						if (string(getenv("USER")) == "u") {
+							autoMode = !autoMode;
+						}
+						break;
 					case sf::Keyboard::Num1:
 						events.push_back(Event(Event::LIB1));
 						break;
@@ -233,6 +240,10 @@ vector<Event> getEvents() {
 				}
 				break;
 		}
+	}
+
+	if (autoMode) {
+		smartMove(data, events);
 	}
 
 	return events;

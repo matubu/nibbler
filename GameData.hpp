@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include <SFML/Audio.hpp>
 
@@ -24,6 +25,10 @@ struct Vec2 {
 
 	Vec2() : x(0), y(0) {}
 	Vec2(i64 x, i64 y) : x(x), y(y) {}
+
+	bool operator < (const Vec2 &other) const {
+		return x < other.x || (x == other.x && y < other.y);
+	}
 };
 
 struct SnakePart: public Vec2 {

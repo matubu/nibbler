@@ -1,5 +1,4 @@
 #include <SDL2/SDL.h>
-#include <iostream>
 
 #include "../GameData.hpp"
 
@@ -32,7 +31,7 @@ void draw(const GameData *data) {
 }
 
 // Collect all the events
-vector<Event> getEvents() {
+vector<Event> getEvents(const GameData *data) {
 	if (!window) {
 		return vector<Event>();
 	}

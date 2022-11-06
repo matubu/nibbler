@@ -1,7 +1,6 @@
 #pragma once
 
 #include <dlfcn.h>
-#include <iostream>
 
 #include "GameData.hpp"
 
@@ -16,7 +15,7 @@ struct Lib {
 	typedef void (*draw_t)(const GameData *);
 	draw_t	draw;
 
-	typedef vector<Event> (*getEvents_t)();
+	typedef vector<Event> (*getEvents_t)(const GameData *data);
 	getEvents_t	getEvents;
 
 	typedef void (*closeWindow_t)();
