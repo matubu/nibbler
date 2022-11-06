@@ -77,7 +77,8 @@ bool contains(const vector<T> &vec, Vec2 pair) {
 }
 
 struct GameData {
-	static const u64 TILE_SIZE = 30;
+	static const u64 TILE_SIZE = 50;
+	static const u64 DEFAULT_SPEED = 20;
 
 	u64 width;
 	u64 height;
@@ -99,7 +100,7 @@ struct GameData {
 
 		this->width = width;
 		this->height = height;
-		this->speed = 30;
+		this->speed = DEFAULT_SPEED;
 
 		this->loadSound(this->ambient_music_audio, "./sounds/ambient_music.wav");
 		this->loadSound(this->apple_bit_audio, "./sounds/apple_bit.wav");
