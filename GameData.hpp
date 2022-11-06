@@ -29,6 +29,14 @@ struct Vec2 {
 	bool operator < (const Vec2 &other) const {
 		return x < other.x || (x == other.x && y < other.y);
 	}
+	template<typename T>
+	bool operator == (const T &other) const {
+		return x == other.x && y == other.y;
+	}
+	template<typename T>
+	bool operator != (const T &other) const {
+		return !(*this == other);
+	}
 };
 
 struct SnakePart: public Vec2 {
@@ -46,6 +54,17 @@ struct SnakePart: public Vec2 {
 		return !(*this == other);
 	}
 };
+
+// struct Snake {
+// 	vector<SnakePart> parts;
+
+// 	Snake() {
+// 		this->snake.push_back(SnakePart(width / 2, height / 2 - 2));
+// 		this->snake.push_back(SnakePart(width / 2, height / 2 - 1));
+// 		this->snake.push_back(SnakePart(width / 2, height / 2    ));
+// 		this->snake.push_back(SnakePart(width / 2, height / 2 + 1));
+// 	}
+// };
 
 template <typename T>
 bool contains(const vector<T> &vec, Vec2 pair) {
@@ -67,7 +86,7 @@ struct GameData {
 	bool gameOver;
 	vector<SnakePart> snake;
 	Vec2 direction;
-	vector<Vec2> food;
+	Vec2 food;
 
 	sf::Music ambient_music_audio;
 	sf::Music apple_bit_audio;
@@ -102,7 +121,6 @@ struct GameData {
 
 		this->direction = Vec2(0, -1);
 
-		this->food.clear();
 		srand(time(NULL) + clock());
 		this->spawnFood();
 
@@ -120,7 +138,7 @@ struct GameData {
 			Vec2 food(rand() % width, rand() % height);
 			// Check if the food is not already on the snake
 			if (!contains(this->snake, food)) {
-				this->food.push_back(food);
+				this->food = food;
 				break;
 			}
 		}
@@ -146,11 +164,10 @@ struct GameData {
 			return;
 		}
 
-		bool eat = contains(this->food, Vec2(newX, newY));
+		bool eat = this->food == Vec2(newX, newY);
 		this->snake.insert(this->snake.begin(), SnakePart(newX, newY, eat));
 
 		if (eat) {
-			this->food.erase(this->food.begin());
 			this->spawnFood();
 			this->apple_bit_audio.stop();
 			this->apple_bit_audio.play();

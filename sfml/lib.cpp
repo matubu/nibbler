@@ -9,12 +9,16 @@ using std::map;
 sf::RenderWindow *window = NULL;
 
 sf::Sprite *sprite;
+
 map<string, sf::Texture> *textures;
+vector<string> texturesPacks{"blue", "orange", "green"};
+u64 currentTexturePack = 0;
 
 sf::Font font;
 
 bool useBot = false;
 
+const u64 HELP_FONT_SIZE = 15;
 const u64 TEXT_FONT_SIZE = 24;
 const u64 TITLE_FONT_SIZE = 48;
 
@@ -24,6 +28,28 @@ void loadTexture(const string &name) {
 	if (!(*textures)[name].loadFromFile(path.c_str())) {
 		die("failed to load texture");
 	}
+}
+
+void loadTextureFromPack(const string &name) {
+	string path = "sfml/assets/" + texturesPacks[currentTexturePack] + "/" + name + ".png";
+
+	if (!(*textures)[name].loadFromFile(path.c_str())) {
+		die("failed to load texture");
+	}
+}
+
+void loadAllTextures() {
+	loadTextureFromPack("head");
+	loadTextureFromPack("body_straight");
+	loadTextureFromPack("body_turn");
+	loadTextureFromPack("tail");
+	loadTextureFromPack("head_eating");
+	loadTextureFromPack("body_straight_eating");
+	loadTextureFromPack("body_turn_eating");
+	loadTextureFromPack("tail_eating");
+	loadTextureFromPack("head_dead");
+	loadTexture("food");
+	loadTexture("death_overlay");
 }
 
 void drawSprite(const GameData *data, i64 x, i64 y, i64 rot, const string &path) {
@@ -105,17 +131,8 @@ void createWindow(const GameData *data) {
 
 	sprite = new sf::Sprite();
 	textures = new map<string, sf::Texture>();
-	loadTexture("head");
-	loadTexture("body_straight");
-	loadTexture("body_turn");
-	loadTexture("tail");
-	loadTexture("head_eating");
-	loadTexture("body_straight_eating");
-	loadTexture("body_turn_eating");
-	loadTexture("tail_eating");
-	loadTexture("head_dead");
-	loadTexture("food");
-	loadTexture("death_overlay");
+
+	loadAllTextures();
 
 	if (!font.loadFromFile("sfml/fonts/SigmarOne-Regular.ttf")) {
 		die("failed to load font");
@@ -173,17 +190,16 @@ void draw(const GameData *data) {
 
 	draw_snake(data);
 
-	for (auto p : data->food) {
-		drawSprite(data, p.x, p.y, 0, "food");
-	}
+	drawSprite(data, data->food.x, data->food.y, 0, "food");
 
 	sf::Text text;
 	text.setFont(font);
 	text.setString("Score: " + std::to_string(data->snake.size())
 		+ (useBot ? "\n[B] Disable bot" : "\n[B] Enable bot")
 		+ "\n[+/-] Speed: " + std::to_string(data->speed)
+		+ "\n[Tab] Theme: " + texturesPacks[currentTexturePack]
 	);
-	text.setCharacterSize(TEXT_FONT_SIZE);
+	text.setCharacterSize(HELP_FONT_SIZE);
 	text.setFillColor(sf::Color::White);
 	text.setPosition(15, 10);
 	window->draw(text);
@@ -264,6 +280,11 @@ vector<Event> getEvents(const GameData *data) {
 						break;
 					case sf::Keyboard::R:
 						events.push_back(Event(Event::RESET));
+						break;
+					case sf::Keyboard::Tab:
+						currentTexturePack = (currentTexturePack + 1) % texturesPacks.size();
+						textures->clear();
+						loadAllTextures();
 						break;
 					case sf::Keyboard::Num1:
 						events.push_back(Event(Event::LIB1));

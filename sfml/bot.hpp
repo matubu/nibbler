@@ -63,7 +63,7 @@ Vec2 bfs(const GameData *data, const Vec2 &goal) {
 	BfsQueue queue;
 	std::map<Vec2, BfsNode> parent;
 
-	queue.push(BfsNode(data->snake[0], data->food[0]));
+	queue.push(BfsNode(data->snake[0], goal));
 
 	while (!queue.empty()) {
 		BfsNode pos = queue.top();
@@ -93,11 +93,11 @@ void smartMove(const GameData *data, vector<Event> &events) {
 	static Vec2 lastPos = data->snake[0];
 
 	if (data->snake[0] != lastPos) {
-		if (data->snake.size() > 50) {
-			next = bfs(data, data->snake[0]);
-		} else {
-			next = bfs(data, data->food[0]);
-		}
+		// if (data->snake.size() > 50) {
+		// 	next = bfs(data, data->snake[0]);
+		// } else {
+			next = bfs(data, data->food);
+		// }
 		lastPos = data->snake[0];
 
 		if (next.x > data->snake[0].x) {
