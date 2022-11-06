@@ -1,4 +1,4 @@
 *.so
 nibbler
 .vscode
-raylib/raylib
+raylib/raylib/*
