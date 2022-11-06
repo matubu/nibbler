@@ -12,7 +12,7 @@ SDL_Renderer	*renderer = NULL;
 
 void createWindow(const GameData *data) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-		printf("error initializing SDL: %s\n", SDL_GetError());
+		printf("Error initializing SDL: %s\n", SDL_GetError());
 
 	// Create window
 	window = SDL_CreateWindow("Nibbler - SDL2",

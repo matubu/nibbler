@@ -1,9 +1,47 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <map>
 
 #include "../GameData.hpp"
 
+using std::map;
+
 sf::RenderWindow *window = NULL;
+
+sf::Sprite *sprite;
+map<string, sf::Texture> *textures;
+
+void die(char *s) {
+	std::cerr << "Error: " << s << std::endl;
+	exit(1);
+}
+
+sf::Texture loadTexture(const string &path) {
+	sf::Texture tex;
+	if (!tex.loadFromFile(path.c_str())) {
+		die("failed to load texture");
+	}
+	return tex;
+}
+
+void drawSprite(const GameData *data, i64 x, i64 y, i64 rot, const string &path) {
+	sf::Texture &tex = (*textures)[path];
+	sprite->setTexture(tex);
+	sprite->setOrigin(
+		tex.getSize().x / 2,
+		tex.getSize().y / 2
+	);
+	sprite->setScale(
+		((float)window->getSize().x / tex.getSize().x) / data->width,
+		((float)window->getSize().y / tex.getSize().y) / data->height
+	);
+	sprite->setPosition(
+		x * GameData::TILE_SIZE + GameData::TILE_SIZE / 2,
+		y * GameData::TILE_SIZE + GameData::TILE_SIZE / 2
+	);
+	sprite->setRotation(rot * 90);
+	window->draw(*sprite);
+}
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,6 +55,41 @@ void createWindow(const GameData *data) {
 		),
 		"Nibbler - SFML"
 	);
+
+	sprite = new sf::Sprite();
+	textures = new map<string, sf::Texture>{
+		{"body_straight", loadTexture("sfml/assets/body_straight.png")},
+		{"body_turn", loadTexture("sfml/assets/body_turn.png")},
+		{"food", loadTexture("sfml/assets/food.png")},
+		{"head", loadTexture("sfml/assets/head.png")},
+		{"tail", loadTexture("sfml/assets/tail.png")},
+	};
+}
+
+i64 atan_4(i64 x, i64 y) {
+	if (y < 0) {
+		return 0;
+	}
+	if (x > 0) {
+		return 1;
+	}
+	if (y > 0) {
+		return 2;
+	}
+	return 3;
+}
+
+pair<i64, i64> angle_to_vec(i64 angle) {
+	switch ((angle % 4 + 4) % 4) {
+		case 0:
+			return {0, -1};
+		case 1:
+			return {1, 0};
+		case 2:
+			return {0, 1};
+		case 3:
+			return {-1, 0};
+	}
 }
 
 void draw(const GameData *data) {
@@ -24,33 +97,56 @@ void draw(const GameData *data) {
 		return ;
 	}
 
-	window->clear(sf::Color::Black);
-
-	sf::RectangleShape rectangle(sf::Vector2f(GameData::TILE_SIZE, GameData::TILE_SIZE));
+	window->clear(sf::Color(0x0E183D00));
 
 	for (int i = 0; i < data->snake.size(); i++) {
-		rectangle.setPosition(
-			data->snake[i].first * GameData::TILE_SIZE,
-			data->snake[i].second * GameData::TILE_SIZE
-		);
+		i64 x = data->snake[i].first;
+		i64 y = data->snake[i].second;
+		i64 rot = 0;
+		string texture;
+
+		// Find the right texture and rotation
 		if (i == 0) {
-			rectangle.setFillColor(sf::Color::Magenta);
+			rot = atan_4(
+				x - data->snake[i + 1].first,
+				y - data->snake[i + 1].second
+			);
+			texture = "head";
 		} else if (i == data->snake.size() - 1) {
-			rectangle.setFillColor(sf::Color::Cyan);
+			rot = atan_4(
+				data->snake[i - 1].first - x,
+				data->snake[i - 1].second - y
+			);
+			texture = "tail";
 		} else {
-			rectangle.setFillColor(sf::Color::Blue);
+			if (data->snake[i - 1].first == data->snake[i + 1].first
+				|| data->snake[i - 1].second == data->snake[i + 1].second) {
+				if (data->snake[i - 1].second == y) {
+					rot = 1;
+				}
+				texture = "body_straight";
+			} else {
+				rot = atan_4(
+					data->snake[i - 1].first - x,
+					data->snake[i - 1].second - y	
+				);
+				pair<i64, i64> expected{
+					x + angle_to_vec(rot - 1).first,
+					y + angle_to_vec(rot - 1).second
+				};
+				// Detect left or right turn
+				if (data->snake[i + 1] != expected) {
+					rot += 1;
+				}
+				texture = "body_turn";
+			}
 		}
-		window->draw(rectangle);
+
+		drawSprite(data, x, y, rot, texture);
 	}
 
-	sf::CircleShape circle(GameData::TILE_SIZE / 2);
-	for (auto food : data->food) {
-		circle.setPosition(
-			food.first * GameData::TILE_SIZE,
-			food.second * GameData::TILE_SIZE
-		);
-		circle.setFillColor(sf::Color::Red);
-		window->draw(circle);
+	for (auto p : data->food) {
+		drawSprite(data, p.first, p.second, 0, "food");
 	}
 
 	window->display();
@@ -116,6 +212,9 @@ void closeWindow() {
 	window->close();
 	delete window;
 	window = NULL;
+
+	delete sprite;
+	delete textures;
 }
 
 #ifdef __cplusplus

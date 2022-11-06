@@ -22,14 +22,16 @@ bool contains(const vector<pair<i64, i64>> &vec, pair<i64, i64> pair) {
 }
 
 struct GameData {
-	static const u64 TILE_SIZE = 30;
+	static const u64 TILE_SIZE = 20;
+	static const u64 MOVE_PER_SEC = 15;
 
 	u64 width;
 	u64 height;
 
+	bool gameOver;
 	vector<pair<i64, i64>> snake;
 	vector<pair<i64, i64>> food;
-	bool gameOver;
+	pair<i64, i64> direction;
 
 	GameData(u64 width, u64 height) {
 		if (width < 4 || height < 4) {
@@ -48,12 +50,15 @@ struct GameData {
 
 		srand(time(NULL));
 		this->spawnFood();
+
+		this->direction = make_pair(0, -1);
 	}
 
 	void spawnFood() {
 		// TODO handle no space left on screen
 		while (1) {
 			pair<i64, i64> food = make_pair(rand() % width, rand() % height);
+			// Check if the food is not already on the snake
 			if (!contains(this->snake, food)) {
 				this->food.push_back(food);
 				break;
@@ -61,13 +66,13 @@ struct GameData {
 		}
 	}
 
-	void moveSnake(i64 dx, i64 dy) {
+	void updateSnake() {
 		if (this->gameOver) {
 			return;
 		}
 
-		i64 newX = this->snake[0].first + dx;
-		i64 newY = this->snake[0].second + dy;
+		i64 newX = this->snake[0].first + this->direction.first;
+		i64 newY = this->snake[0].second + this->direction.second;
 
 		if (newX < 0 || newX >= this->width || newY < 0 || newY >= this->height
 			|| contains(this->snake, make_pair(newX, newY))) {
@@ -83,5 +88,13 @@ struct GameData {
 		}
 
 		this->snake.insert(this->snake.begin(), make_pair(newX, newY));
+	}
+
+	void changeDirection(i64 x, i64 y) {
+		// Block opposite direction
+		if (this->snake[0].first + x != this->snake[1].first
+			|| this->snake[0].second + y != this->snake[1].second) {
+			this->direction = make_pair(x, y);
+		}
 	}
 };
