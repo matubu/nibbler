@@ -53,7 +53,7 @@ bool contains(const vector<T> &vec, Vec2 pair) {
 }
 
 struct GameData {
-	static const u64 TILE_SIZE = 20;
+	static const u64 TILE_SIZE = 30;
 	static const u64 MOVE_PER_SEC = 15;
 
 	u64 width;
@@ -69,15 +69,26 @@ struct GameData {
 	sf::Music game_over_audio;
 
 	GameData(u64 width, u64 height) {
-		if (width < 4 || height < 4) {
-			throw "Width and height must be at least 4";
+		if (width < 10 || height < 10) {
+			throw "Width and height must be at least 10x10";
 		}
 
 		this->width = width;
 		this->height = height;
 
+		this->loadSound(this->ambient_music_audio, "./sounds/ambient_music.wav");
+		this->loadSound(this->apple_bit_audio, "./sounds/apple_bit.wav");
+		this->loadSound(this->game_over_audio, "./sounds/game_over.wav");
+		this->ambient_music_audio.setLoop(true);
+		this->ambient_music_audio.setVolume(50);
+
+		this->reset();
+	}
+
+	void reset() {
 		this->gameOver = false;
 
+		this->snake.clear();
 		this->snake.push_back(SnakePart(width / 2, height / 2 - 2));
 		this->snake.push_back(SnakePart(width / 2, height / 2 - 1));
 		this->snake.push_back(SnakePart(width / 2, height / 2    ));
@@ -85,14 +96,11 @@ struct GameData {
 
 		this->direction = Vec2(0, -1);
 
+		this->food.clear();
 		srand(time(NULL));
 		this->spawnFood();
 
-		this->loadSound(this->ambient_music_audio, "./sounds/ambient_music.wav");
-		this->loadSound(this->apple_bit_audio, "./sounds/apple_bit.wav");
-		this->loadSound(this->game_over_audio, "./sounds/game_over.wav");
-		this->ambient_music_audio.setLoop(true);
-		this->ambient_music_audio.setVolume(50);
+		this->ambient_music_audio.stop();
 		this->ambient_music_audio.play();
 	}
 

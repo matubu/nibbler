@@ -11,6 +11,8 @@ sf::RenderWindow *window = NULL;
 sf::Sprite *sprite;
 map<string, sf::Texture> *textures;
 
+sf::Font font;
+
 void loadTexture(const string &name) {
 	string path = "sfml/assets/" + name + ".png";
 
@@ -23,8 +25,8 @@ void drawSprite(const GameData *data, i64 x, i64 y, i64 rot, const string &path)
 	sf::Texture &tex = (*textures)[path];
 	sprite->setTexture(tex);
 	sprite->setOrigin(
-		tex.getSize().x / 2,
-		tex.getSize().y / 2
+		tex.getSize().x / 2.0 - 0.5,
+		tex.getSize().y / 2.0 - 0.5
 	);
 	sprite->setScale(
 		((float)window->getSize().x / tex.getSize().x) / data->width,
@@ -36,6 +38,51 @@ void drawSprite(const GameData *data, i64 x, i64 y, i64 rot, const string &path)
 	);
 	sprite->setRotation(rot * 90);
 	window->draw(*sprite);
+}
+
+Vec2 angle_to_vec(i64 angle) {
+	switch ((angle % 4 + 4) % 4) {
+		case 0:
+			return {0, -1};
+		case 1:
+			return {1, 0};
+		case 2:
+			return {0, 1};
+		case 3:
+			return {-1, 0};
+	}
+	return {0, 0};
+}
+
+i64 get_snake_tile_orientation(const SnakePart &a, const SnakePart &b) {
+	// a-b
+	if (b.y > a.y) {
+		return 0;
+	}
+	if (a.x > b.x) {
+		return 1;
+	}
+	if (b.y != a.y) {
+		return 2;
+	}
+	return 3;
+}
+
+i64 get_snake_tile_orientation(
+	const SnakePart &a,
+	const SnakePart &b,
+	const SnakePart &c
+) {
+	i64 rot = get_snake_tile_orientation(a, b);
+	Vec2 expected(
+		b.x + angle_to_vec(rot - 1).x,
+		b.y + angle_to_vec(rot - 1).y
+	);
+	// Detect left or right turn
+	if (c != expected) {
+		rot += 1;
+	}
+	return rot;
 }
 
 #ifdef __cplusplus
@@ -61,34 +108,54 @@ void createWindow(const GameData *data) {
 	loadTexture("body_straight_eating");
 	loadTexture("body_turn_eating");
 	loadTexture("tail_eating");
+	loadTexture("head_dead");
 	loadTexture("food");
+
+	if (!font.loadFromFile("sfml/fonts/SigmarOne-Regular.ttf")) {
+		die("failed to load font");
+	}
 }
 
-i64 atan_4(i64 x, i64 y) {
-	if (y < 0) {
-		return 0;
-	}
-	if (x > 0) {
-		return 1;
-	}
-	if (y > 0) {
-		return 2;
-	}
-	return 3;
-}
+void draw_snake(const GameData *data) {
+	for (int i = 0; i < data->snake.size(); i++) {
+		i64 x = data->snake[i].x;
+		i64 y = data->snake[i].y;
+		i64 rot = 0;
+		string texture;
 
-Vec2 angle_to_vec(i64 angle) {
-	switch ((angle % 4 + 4) % 4) {
-		case 0:
-			return {0, -1};
-		case 1:
-			return {1, 0};
-		case 2:
-			return {0, 1};
-		case 3:
-			return {-1, 0};
+		// Find the right texture and rotation
+		if (i == 0) {
+			rot = get_snake_tile_orientation(data->snake[i], data->snake[i + 1]);
+			texture = "head";
+		} else if (i == data->snake.size() - 1) {
+			rot = get_snake_tile_orientation(data->snake[i - 1], data->snake[i]);
+			texture = "tail";
+		} else {
+			if (data->snake[i - 1].x == data->snake[i + 1].x
+				|| data->snake[i - 1].y == data->snake[i + 1].y) {
+				rot = get_snake_tile_orientation(
+					data->snake[i - 1],
+					data->snake[i]
+				);
+				texture = "body_straight";
+			} else {
+				rot = get_snake_tile_orientation(
+					data->snake[i - 1],
+					data->snake[i],
+					data->snake[i + 1]
+				);
+				texture = "body_turn";
+			}
+		}
+
+		if (data->snake[i].isEating) {
+			texture += "_eating";
+		}
+		if (data->gameOver && texture == "head") {
+			texture += "_dead";
+		}
+		drawSprite(data, x, y, rot, texture);
 	}
-	return {0, 0};
 }
 
 void draw(const GameData *data) {
@@ -98,58 +165,19 @@ void draw(const GameData *data) {
 
 	window->clear(sf::Color(0x0E183D00));
 
-	for (int i = 0; i < data->snake.size(); i++) {
-		i64 x = data->snake[i].x;
-		i64 y = data->snake[i].y;
-		i64 rot = 0;
-		string texture;
-
-		// Find the right texture and rotation
-		if (i == 0) {
-			rot = atan_4(
-				x - data->snake[i + 1].x,
-				y - data->snake[i + 1].y
-			);
-			texture = "head";
-		} else if (i == data->snake.size() - 1) {
-			rot = atan_4(
-				data->snake[i - 1].x - x,
-				data->snake[i - 1].y - y
-			);
-			texture = "tail";
-		} else {
-			if (data->snake[i - 1].x == data->snake[i + 1].x
-				|| data->snake[i - 1].y == data->snake[i + 1].y) {
-				if (data->snake[i - 1].y == y) {
-					rot = 1;
-				}
-				texture = "body_straight";
-			} else {
-				rot = atan_4(
-					data->snake[i - 1].x - x,
-					data->snake[i - 1].y - y	
-				);
-				Vec2 expected(
-					x + angle_to_vec(rot - 1).x,
-					y + angle_to_vec(rot - 1).y
-				);
-				// Detect left or right turn
-				if (data->snake[i + 1] != expected) {
-					rot += 1;
-				}
-				texture = "body_turn";
-			}
-		}
-
-		if (data->snake[i].isEating) {
-			texture += "_eating";
-		}
-		drawSprite(data, x, y, rot, texture);
-	}
+	draw_snake(data);
 
 	for (auto p : data->food) {
 		drawSprite(data, p.x, p.y, 0, "food");
 	}
+
+	sf::Text text;
+	text.setFont(font);
+	text.setString("Score: " + std::to_string(data->snake.size()));
+	text.setCharacterSize(24);
+	text.setFillColor(sf::Color::White);
+	text.setPosition(15, 10);
+	window->draw(text);
 
 	window->display();
 }
@@ -175,15 +203,19 @@ vector<Event> getEvents() {
 				// Handle key presses
 				switch (event.key.code) {
 					case sf::Keyboard::Up:
+					case sf::Keyboard::W:
 						events.push_back(Event(Event::UP));
 						break;
 					case sf::Keyboard::Down:
+					case sf::Keyboard::S:
 						events.push_back(Event(Event::DOWN));
 						break;
 					case sf::Keyboard::Left:
+					case sf::Keyboard::A:
 						events.push_back(Event(Event::LEFT));
 						break;
 					case sf::Keyboard::Right:
+					case sf::Keyboard::D:
 						events.push_back(Event(Event::RIGHT));
 						break;
 					case sf::Keyboard::Num1:

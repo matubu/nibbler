@@ -6,6 +6,7 @@ struct Event {
 		DOWN,
 		LEFT,
 		RIGHT,
+		RESET,
 		LIB1,
 		LIB2,
 		LIB3,
