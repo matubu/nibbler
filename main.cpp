@@ -1,7 +1,7 @@
 #include "Lib.hpp"
 
 int main() {
-	GameData data(80, 80);
+	GameData data(30, 30);
 	Lib lib(Lib::LIB1, &data);
 
 	int				nextUpdate = 0;

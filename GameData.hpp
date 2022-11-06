@@ -58,8 +58,8 @@ bool contains(const vector<T> &vec, Vec2 pair) {
 }
 
 struct GameData {
-	static const u64 TILE_SIZE = 10;
-	static const u64 MOVE_PER_SEC = 1000;
+	static const u64 TILE_SIZE = 30;
+	static const u64 MOVE_PER_SEC = 15;
 
 	u64 width;
 	u64 height;
@@ -102,7 +102,7 @@ struct GameData {
 		this->direction = Vec2(0, -1);
 
 		this->food.clear();
-		srand(time(NULL));
+		srand(time(NULL) + clock());
 		this->spawnFood();
 
 		this->ambient_music_audio.stop();

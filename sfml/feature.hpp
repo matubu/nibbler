@@ -85,19 +85,21 @@ Vec2 bfs(const GameData *data) {
 }
 
 void smartMove(const GameData *data, vector<Event> &events) {
-	static Vec2 next = data->snake[0];
+	static Vec2 next;
+	static Vec2 lastPos = data->snake[0];
 
-	if (data->snake[0] == next) {
+	if (data->snake[0] != lastPos) {
 		next = bfs(data);
-	}
+		lastPos = data->snake[0];
 
-	if (next.x > data->snake[0].x) {
-		events.push_back(Event(Event::RIGHT));
-	} else if (next.x < data->snake[0].x) {
-		events.push_back(Event(Event::LEFT));
-	} else if (next.y > data->snake[0].y) {
-		events.push_back(Event(Event::DOWN));
-	} else if (next.y < data->snake[0].y) {
-		events.push_back(Event(Event::UP));
+		if (next.x > data->snake[0].x) {
+			events.push_back(Event::RIGHT);
+		} else if (next.x < data->snake[0].x) {
+			events.push_back(Event::LEFT);
+		} else if (next.y > data->snake[0].y) {
+			events.push_back(Event::DOWN);
+		} else if (next.y < data->snake[0].y) {
+			events.push_back(Event::UP);
+		}
 	}
 }

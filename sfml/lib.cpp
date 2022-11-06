@@ -13,7 +13,10 @@ map<string, sf::Texture> *textures;
 
 sf::Font font;
 
-bool autoMode = false;
+bool useBot = false;
+
+const u64 TEXT_FONT_SIZE = 24;
+const u64 TITLE_FONT_SIZE = 48;
 
 void loadTexture(const string &name) {
 	string path = "sfml/assets/" + name + ".png";
@@ -112,12 +115,11 @@ void createWindow(const GameData *data) {
 	loadTexture("tail_eating");
 	loadTexture("head_dead");
 	loadTexture("food");
+	loadTexture("death_overlay");
 
 	if (!font.loadFromFile("sfml/fonts/SigmarOne-Regular.ttf")) {
 		die("failed to load font");
 	}
-
-	autoMode = string(getenv("USER")) == "u";
 }
 
 void draw_snake(const GameData *data) {
@@ -152,11 +154,11 @@ void draw_snake(const GameData *data) {
 			}
 		}
 
-		if (data->snake[i].isEating) {
-			texture += "_eating";
-		}
 		if (data->gameOver && texture == "head") {
 			texture += "_dead";
+		}
+		else if (data->snake[i].isEating) {
+			texture += "_eating";
 		}
 		drawSprite(data, x, y, rot, texture);
 	}
@@ -177,11 +179,39 @@ void draw(const GameData *data) {
 
 	sf::Text text;
 	text.setFont(font);
-	text.setString("Score: " + std::to_string(data->snake.size()));
-	text.setCharacterSize(24);
+	text.setString("Score: " + std::to_string(data->snake.size())
+		+ (useBot ? "\n[B] Disable bot" : "\n[B] Enable bot")
+	);
+	text.setCharacterSize(TEXT_FONT_SIZE);
 	text.setFillColor(sf::Color::White);
 	text.setPosition(15, 10);
 	window->draw(text);
+
+	if (data->gameOver) {
+		sf::Texture &deathOverlayTexture = (*textures)["death_overlay"];
+		sf::Sprite deathOverlay(deathOverlayTexture);
+		deathOverlay.setScale(sf::Vector2f(
+			((float)window->getSize().x / deathOverlayTexture.getSize().x),
+			((float)window->getSize().y / deathOverlayTexture.getSize().y)
+		));
+		window->draw(deathOverlay);
+
+		text.setString("Game Over!");
+		text.setCharacterSize(TITLE_FONT_SIZE);
+		text.setPosition(
+			window->getSize().x / 2 - text.getGlobalBounds().width / 2,
+			window->getSize().y / 2 - TITLE_FONT_SIZE - TEXT_FONT_SIZE
+		);
+		window->draw(text);
+
+		text.setString("Press R to Restart");
+		text.setCharacterSize(TEXT_FONT_SIZE);
+		text.setPosition(
+			window->getSize().x / 2 - text.getGlobalBounds().width / 2,
+			window->getSize().y / 2 + TEXT_FONT_SIZE / 2
+		);
+		window->draw(text);
+	}
 
 	window->display();
 }
@@ -222,10 +252,11 @@ vector<Event> getEvents(const GameData *data) {
 					case sf::Keyboard::D:
 						events.push_back(Event(Event::RIGHT));
 						break;
-					case sf::Keyboard::U:
-						if (string(getenv("USER")) == "u") {
-							autoMode = !autoMode;
-						}
+					case sf::Keyboard::B:
+						useBot = !useBot;
+						break;
+					case sf::Keyboard::R:
+						events.push_back(Event(Event::RESET));
 						break;
 					case sf::Keyboard::Num1:
 						events.push_back(Event(Event::LIB1));
@@ -244,7 +275,7 @@ vector<Event> getEvents(const GameData *data) {
 		}
 	}
 
-	if (autoMode) {
+	if (useBot) {
 		smartMove(data, events);
 	}
 
