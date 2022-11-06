@@ -17,7 +17,7 @@ const u64 TEXT_FONT_SIZE = 24;
 const u64 TITLE_FONT_SIZE = 48;
 
 void drawSprite(const GameData *data, i64 x, i64 y, i64 rot, const string &path) {
-	sf::Texture &tex = (*textures)[path];
+	const sf::Texture &tex = getTexture(path);
 	sprite->setTexture(tex);
 	sprite->setOrigin(
 		tex.getSize().x / 2.0 - 0.5,
@@ -90,12 +90,12 @@ void createWindow(const GameData *data) {
 			data->width * GameData::TILE_SIZE,
 			data->height * GameData::TILE_SIZE
 		),
-		"Nibbler - SFML"
+		"Nibbler - SFML",
+		sf::Style::Close
 	);
 
 	sprite = new sf::Sprite();
 	textures = new map<string, sf::Texture>();
-
 	loadAllTextures();
 
 	if (!font.loadFromFile("sfml/fonts/SigmarOne-Regular.ttf")) {
@@ -170,7 +170,7 @@ void draw(const GameData *data) {
 	window->draw(text);
 
 	if (data->gameOver) {
-		sf::Texture &deathOverlayTexture = (*textures)["death_overlay"];
+		const sf::Texture &deathOverlayTexture = getTexture("death_overlay");
 		sf::Sprite deathOverlay(deathOverlayTexture);
 		deathOverlay.setScale(sf::Vector2f(
 			((float)window->getSize().x / deathOverlayTexture.getSize().x),
@@ -248,8 +248,6 @@ vector<Event> getEvents(const GameData *data) {
 						break;
 					case sf::Keyboard::Tab:
 						currentTexturePack = (currentTexturePack + 1) % texturesPacks.size();
-						textures->clear();
-						loadAllTextures();
 						break;
 					case sf::Keyboard::Num1:
 						events.push_back(Event(Event::LIB1));

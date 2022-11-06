@@ -16,7 +16,7 @@ struct BfsNode {
 	BfsNode(Vec2 pos, Vec2 goal, u64 depth = 0)
 		: pos(pos), depth(depth) {
 		dist = abs(pos.x - goal.x) + abs(pos.y - goal.y);
-		score = dist + rand() % 3;
+		score = dist + rand() % 2;
 	}
 };
 

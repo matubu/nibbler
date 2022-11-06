@@ -20,11 +20,17 @@ void loadTexture(const string &name) {
 }
 
 void loadTextureFromPack(const string &name) {
-	string path = "sfml/assets/" + texturesPacks[currentTexturePack] + "/" + name + ".png";
-
-	if (!(*textures)[name].loadFromFile(path.c_str())) {
-		die("failed to load texture");
+	for (auto pack : texturesPacks) {
+		loadTexture(pack + "/" + name);
 	}
+}
+
+const sf::Texture &getTexture(const string &name) {
+	auto it = textures->find(name);
+	if (it == textures->end()) {
+		it = textures->find(texturesPacks[currentTexturePack] + "/" + name);
+	}
+	return it->second;
 }
 
 const string getFoodTexture(i64 x, i64 y) {
