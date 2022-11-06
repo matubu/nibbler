@@ -54,17 +54,6 @@ struct SnakePart: public Vec2 {
 	}
 };
 
-// struct Snake {
-// 	vector<SnakePart> parts;
-
-// 	Snake() {
-// 		this->snake.push_back(SnakePart(width / 2, height / 2 - 2));
-// 		this->snake.push_back(SnakePart(width / 2, height / 2 - 1));
-// 		this->snake.push_back(SnakePart(width / 2, height / 2    ));
-// 		this->snake.push_back(SnakePart(width / 2, height / 2 + 1));
-// 	}
-// };
-
 template <typename T>
 bool contains(const vector<T> &vec, Vec2 pair) {
 	for (auto p : vec) {
@@ -76,11 +65,11 @@ bool contains(const vector<T> &vec, Vec2 pair) {
 }
 
 void	usageMessage() {
-	std::cout << "+--------------------------------------------+" << std::endl;
-	std::cout << "Usage:" << std::endl;
-	std::cout << "Mandatory: ./nibbler <width >= 10> <height >= 10>" << std::endl;
-	std::cout << "Options: ./nibbler <width >= 10> <height >= 10> [no-music, multiplayer, speed=<number>]" << std::endl;
-	std::cout << "+--------------------------------------------+" << std::endl;
+	std::cout << "+---------------------------------------------------------+" << std::endl;
+	std::cout << "| Usage:" << std::endl;
+	std::cout << "| 	Mandatory: ./nibbler <width >= 10> <height >= 10>" << std::endl;
+	std::cout << "| 	Options: ./nibbler <width >= 10> <height >= 10> [no-music, multiplayer, speed=<number>]" << std::endl;
+	std::cout << "+---------------------------------------------------------+" << std::endl;
 	exit(EXIT_FAILURE);
 }
 
@@ -96,11 +85,11 @@ struct GameData {
 	vector<SnakePart> snake;
 	Vec2 direction;
 
-	vector<SnakePart> snake2;
-	Vec2 direction2;
-
 	Vec2 food;
 
+	// Optionnal stuff
+	vector<SnakePart> snake2;
+	Vec2 direction2;
 	bool music = true;
 	bool multiplayer = false;
 
@@ -135,8 +124,10 @@ struct GameData {
 			usageMessage();
 		}
 
-		if (width < 10 || height < 10)
+		if (av[1][0] == '-' || av[2][0] == '-')
 			usageMessage();
+
+		std::cout << width << height << std::endl;
 
 		this->speed = DEFAULT_SPEED;
 
@@ -153,6 +144,8 @@ struct GameData {
 				this->multiplayer = true;
 			if (option.substr(0, option.find("=")) == "speed")
 			{
+				if (option.substr(option.find("=") + 1)[0] == '-')
+					continue ;
 				try {
 					this->speed = std::stoi(option.substr(option.find("=") + 1));
 				}
@@ -168,18 +161,18 @@ struct GameData {
 		this->gameOver = false;
 
 		this->snake.clear();
-		this->snake.push_back(SnakePart(width / 2, height / 2 - 2));
-		this->snake.push_back(SnakePart(width / 2, height / 2 - 1));
-		this->snake.push_back(SnakePart(width / 2, height / 2    ));
-		this->snake.push_back(SnakePart(width / 2, height / 2 + 1));
+		this->snake.push_back(SnakePart(width / 2 - (multiplayer ? 3 : 0), height / 2 - 2));
+		this->snake.push_back(SnakePart(width / 2 - (multiplayer ? 3 : 0), height / 2 - 1));
+		this->snake.push_back(SnakePart(width / 2 - (multiplayer ? 3 : 0), height / 2    ));
+		this->snake.push_back(SnakePart(width / 2 - (multiplayer ? 3 : 0), height / 2 + 1));
 		this->direction = Vec2(0, -1);
 
 		if (this->multiplayer) {
 			this->snake2.clear();
-			this->snake2.push_back(SnakePart(width / 2 + 10, height / 2 - 2));
-			this->snake2.push_back(SnakePart(width / 2 + 10, height / 2 - 1));
-			this->snake2.push_back(SnakePart(width / 2 + 10, height / 2    ));
-			this->snake2.push_back(SnakePart(width / 2 + 10, height / 2 + 1));
+			this->snake2.push_back(SnakePart(width / 2 + 3, height / 2 - 2));
+			this->snake2.push_back(SnakePart(width / 2 + 3, height / 2 - 1));
+			this->snake2.push_back(SnakePart(width / 2 + 3, height / 2    ));
+			this->snake2.push_back(SnakePart(width / 2 + 3, height / 2 + 1));
 			this->direction2 = Vec2(0, -1);
 		}
 
@@ -212,15 +205,12 @@ struct GameData {
 	}
 
 	void updateSnake(bool multi) {
-		if (this->gameOver) {
-			return;
-		}
+		if (this->gameOver) return;
 
 		vector<SnakePart>	*updateSnake = &this->snake;
 		Vec2				*updateDirection = &this->direction;
 
-		if (multi)
-		{
+		if (multi) {
 			updateSnake = &this->snake2;
 			updateDirection = &this->direction2;
 		}
