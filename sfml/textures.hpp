@@ -3,6 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include <map>
 
+using std::map;
+
 map<string, sf::Texture> *textures;
 vector<string> texturesPacks{"blue", "orange", "green"};
 u64 currentTexturePack = 0;

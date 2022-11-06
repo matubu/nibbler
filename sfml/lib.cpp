@@ -4,8 +4,6 @@
 #include "textures.hpp"
 #include "bot.hpp"
 
-using std::map;
-
 sf::RenderWindow *window = NULL;
 
 sf::Sprite *sprite;
