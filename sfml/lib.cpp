@@ -261,7 +261,11 @@ vector<Event> getEvents(const GameData *data) {
 					case sf::Keyboard::Escape:
 						events.push_back(Event(Event::QUIT));
 						break;
+					default:
+						break;
 				}
+				default:
+					break;
 				break;
 		}
 	}

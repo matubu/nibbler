@@ -5,9 +5,8 @@
 #include <string>
 #include <iostream>
 
-#include <SFML/Audio.hpp>
-
 #include "Event.hpp"
+#include "Audio.hpp"
 
 using std::vector, std::pair, std::make_pair, std::string;
 
@@ -78,7 +77,7 @@ bool contains(const vector<T> &vec, Vec2 pair) {
 
 struct GameData {
 	static const u64 TILE_SIZE = 50;
-	static const u64 DEFAULT_SPEED = 20;
+	static const u64 DEFAULT_SPEED = 10;
 
 	u64 width;
 	u64 height;
@@ -89,11 +88,15 @@ struct GameData {
 	Vec2 direction;
 	Vec2 food;
 
-	sf::Music ambient_music_audio;
-	sf::Music apple_bit_audio;
-	sf::Music game_over_audio;
+	Audio ambientAudio;
+	Audio appleBitAudio;
+	Audio gameOverAudio;
 
-	GameData(u64 width, u64 height) {
+	GameData(u64 width, u64 height):
+		ambientAudio(Audio("./sounds/ambient_music.wav")),
+		appleBitAudio(Audio("./sounds/apple_bit.wav")),
+		gameOverAudio(Audio("./sounds/game_over.wav"))
+	{
 		if (width < 10 || height < 10) {
 			throw "Width and height must be at least 10x10";
 		}
@@ -102,11 +105,11 @@ struct GameData {
 		this->height = height;
 		this->speed = DEFAULT_SPEED;
 
-		this->loadSound(this->ambient_music_audio, "./sounds/ambient_music.wav");
-		this->loadSound(this->apple_bit_audio, "./sounds/apple_bit.wav");
-		this->loadSound(this->game_over_audio, "./sounds/game_over.wav");
-		this->ambient_music_audio.setLoop(true);
-		this->ambient_music_audio.setVolume(50);
+		// this->ambientAudio = 
+		// this->appleBitAudio = 
+		// this->gameOverAudio 
+		this->ambientAudio.setLoop(true);
+		this->ambientAudio.setVolume(50);
 
 		this->reset();
 	}
@@ -125,13 +128,8 @@ struct GameData {
 		srand(time(NULL) + clock());
 		this->spawnFood();
 
-		this->ambient_music_audio.stop();
-		this->ambient_music_audio.play();
-	}
-
-	void loadSound(sf::Music &sound, string path) {
-		if (!sound.openFromFile(path))
-			die("failed to load sound");
+		this->ambientAudio.stop();
+		this->ambientAudio.play();
 	}
 
 	void spawnFood() {
@@ -147,8 +145,8 @@ struct GameData {
 
 	void setGameOver() {
 		this->gameOver = true;
-		this->ambient_music_audio.stop();
-		this->game_over_audio.play();
+		this->ambientAudio.stop();
+		this->gameOverAudio.play();
 	}
 
 	void updateSnake() {
@@ -170,8 +168,8 @@ struct GameData {
 
 		if (eat) {
 			this->spawnFood();
-			this->apple_bit_audio.stop();
-			this->apple_bit_audio.play();
+			this->appleBitAudio.stop();
+			this->appleBitAudio.play();
 		} else {
 			this->snake.pop_back();
 		}

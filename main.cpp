@@ -51,7 +51,6 @@ int main() {
 			data.updateSnake();
 			nextUpdate = clock() + CLOCKS_PER_SEC / data.speed;
 		}
-
 		lib.draw(&data);
 	}
 }

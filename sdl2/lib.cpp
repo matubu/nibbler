@@ -28,6 +28,8 @@ void draw(const GameData *data) {
 		return ;
 	}
 	SDL_RenderClear(renderer);
+
+	
 }
 
 // Collect all the events
@@ -76,6 +78,8 @@ vector<Event> getEvents(const GameData *data) {
 					default:
 						break;
 				}
+				default:
+					break;
 			}
 	}
 	return events;
