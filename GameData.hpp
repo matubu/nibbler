@@ -14,14 +14,38 @@ typedef uint64_t u64;
 typedef int64_t i64;
 typedef uint8_t byte;
 
-void die(char *s) {
+void die(const string &s) {
 	std::cerr << "Error: " << s << std::endl;
 	exit(1);
 }
 
-bool contains(const vector<pair<i64, i64>> &vec, pair<i64, i64> pair) {
+struct Vec2 {
+	i64 x, y;
+
+	Vec2() : x(0), y(0) {}
+	Vec2(i64 x, i64 y) : x(x), y(y) {}
+};
+
+struct SnakePart: public Vec2 {
+	bool isEating;
+
+	SnakePart(i64 x, i64 y, bool isEating = 0)
+		: Vec2(x, y), isEating(isEating) {}
+
+	template<typename T>
+	bool operator == (const T &other) const {
+		return x == other.x && y == other.y;
+	}
+	template<typename T>
+	bool operator != (const T &other) const {
+		return !(*this == other);
+	}
+};
+
+template <typename T>
+bool contains(const vector<T> &vec, Vec2 pair) {
 	for (auto p : vec) {
-		if (p.first == pair.first && p.second == pair.second) {
+		if (p.x == pair.x && p.y == pair.y) {
 			return true;
 		}
 	}
@@ -36,9 +60,9 @@ struct GameData {
 	u64 height;
 
 	bool gameOver;
-	vector<pair<i64, i64>> snake;
-	vector<pair<i64, i64>> food;
-	pair<i64, i64> direction;
+	vector<SnakePart> snake;
+	Vec2 direction;
+	vector<Vec2> food;
 
 	sf::Music ambient_music_audio;
 	sf::Music apple_bit_audio;
@@ -54,15 +78,15 @@ struct GameData {
 
 		this->gameOver = false;
 
-		this->snake.push_back(make_pair(width / 2, height / 2 - 2));
-		this->snake.push_back(make_pair(width / 2, height / 2 - 1));
-		this->snake.push_back(make_pair(width / 2, height / 2    ));
-		this->snake.push_back(make_pair(width / 2, height / 2 + 1));
+		this->snake.push_back(SnakePart(width / 2, height / 2 - 2));
+		this->snake.push_back(SnakePart(width / 2, height / 2 - 1));
+		this->snake.push_back(SnakePart(width / 2, height / 2    ));
+		this->snake.push_back(SnakePart(width / 2, height / 2 + 1));
+
+		this->direction = Vec2(0, -1);
 
 		srand(time(NULL));
 		this->spawnFood();
-
-		this->direction = make_pair(0, -1);
 
 		this->loadSound(this->ambient_music_audio, "./sounds/ambient_music.wav");
 		this->loadSound(this->apple_bit_audio, "./sounds/apple_bit.wav");
@@ -79,7 +103,7 @@ struct GameData {
 
 	void spawnFood() {
 		while (1) {
-			pair<i64, i64> food = make_pair(rand() % width, rand() % height);
+			Vec2 food(rand() % width, rand() % height);
 			// Check if the food is not already on the snake
 			if (!contains(this->snake, food)) {
 				this->food.push_back(food);
@@ -99,16 +123,17 @@ struct GameData {
 			return;
 		}
 
-		i64 newX = this->snake[0].first + this->direction.first;
-		i64 newY = this->snake[0].second + this->direction.second;
+		i64 newX = this->snake[0].x + this->direction.x;
+		i64 newY = this->snake[0].y + this->direction.y;
 
 		if (newX < 0 || newX >= this->width || newY < 0 || newY >= this->height
-			|| contains(this->snake, make_pair(newX, newY))) {
+			|| contains(this->snake, Vec2(newX, newY))) {
 			this->setGameOver();
 			return;
 		}
 
-		if (contains(this->food, make_pair(newX, newY))) {
+		bool eat = contains(this->food, Vec2(newX, newY));
+		if (eat) {
 			this->food.erase(this->food.begin());
 			this->spawnFood();
 			this->apple_bit_audio.stop();
@@ -117,14 +142,14 @@ struct GameData {
 			this->snake.pop_back();
 		}
 
-		this->snake.insert(this->snake.begin(), make_pair(newX, newY));
+		this->snake.insert(this->snake.begin(), SnakePart(newX, newY, eat));
 	}
 
 	void changeDirection(i64 x, i64 y) {
 		// Block opposite direction
-		if (this->snake[0].first + x != this->snake[1].first
-			|| this->snake[0].second + y != this->snake[1].second) {
-			this->direction = make_pair(x, y);
+		if (this->snake[0].x + x != this->snake[1].x
+			|| this->snake[0].y + y != this->snake[1].y) {
+			this->direction = Vec2(x, y);
 		}
 	}
 };

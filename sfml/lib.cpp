@@ -11,12 +11,12 @@ sf::RenderWindow *window = NULL;
 sf::Sprite *sprite;
 map<string, sf::Texture> *textures;
 
-sf::Texture loadTexture(const string &path) {
-	sf::Texture tex;
-	if (!tex.loadFromFile(path.c_str())) {
+void loadTexture(const string &name) {
+	string path = "sfml/assets/" + name + ".png";
+
+	if (!(*textures)[name].loadFromFile(path.c_str())) {
 		die("failed to load texture");
 	}
-	return tex;
 }
 
 void drawSprite(const GameData *data, i64 x, i64 y, i64 rot, const string &path) {
@@ -52,13 +52,16 @@ void createWindow(const GameData *data) {
 	);
 
 	sprite = new sf::Sprite();
-	textures = new map<string, sf::Texture>{
-		{"body_straight", loadTexture("sfml/assets/body_straight.png")},
-		{"body_turn", loadTexture("sfml/assets/body_turn.png")},
-		{"food", loadTexture("sfml/assets/food.png")},
-		{"head", loadTexture("sfml/assets/head.png")},
-		{"tail", loadTexture("sfml/assets/tail.png")},
-	};
+	textures = new map<string, sf::Texture>();
+	loadTexture("head");
+	loadTexture("body_straight");
+	loadTexture("body_turn");
+	loadTexture("tail");
+	loadTexture("head_eating");
+	loadTexture("body_straight_eating");
+	loadTexture("body_turn_eating");
+	loadTexture("tail_eating");
+	loadTexture("food");
 }
 
 i64 atan_4(i64 x, i64 y) {
@@ -74,7 +77,7 @@ i64 atan_4(i64 x, i64 y) {
 	return 3;
 }
 
-pair<i64, i64> angle_to_vec(i64 angle) {
+Vec2 angle_to_vec(i64 angle) {
 	switch ((angle % 4 + 4) % 4) {
 		case 0:
 			return {0, -1};
@@ -96,40 +99,40 @@ void draw(const GameData *data) {
 	window->clear(sf::Color(0x0E183D00));
 
 	for (int i = 0; i < data->snake.size(); i++) {
-		i64 x = data->snake[i].first;
-		i64 y = data->snake[i].second;
+		i64 x = data->snake[i].x;
+		i64 y = data->snake[i].y;
 		i64 rot = 0;
 		string texture;
 
 		// Find the right texture and rotation
 		if (i == 0) {
 			rot = atan_4(
-				x - data->snake[i + 1].first,
-				y - data->snake[i + 1].second
+				x - data->snake[i + 1].x,
+				y - data->snake[i + 1].y
 			);
 			texture = "head";
 		} else if (i == data->snake.size() - 1) {
 			rot = atan_4(
-				data->snake[i - 1].first - x,
-				data->snake[i - 1].second - y
+				data->snake[i - 1].x - x,
+				data->snake[i - 1].y - y
 			);
 			texture = "tail";
 		} else {
-			if (data->snake[i - 1].first == data->snake[i + 1].first
-				|| data->snake[i - 1].second == data->snake[i + 1].second) {
-				if (data->snake[i - 1].second == y) {
+			if (data->snake[i - 1].x == data->snake[i + 1].x
+				|| data->snake[i - 1].y == data->snake[i + 1].y) {
+				if (data->snake[i - 1].y == y) {
 					rot = 1;
 				}
 				texture = "body_straight";
 			} else {
 				rot = atan_4(
-					data->snake[i - 1].first - x,
-					data->snake[i - 1].second - y	
+					data->snake[i - 1].x - x,
+					data->snake[i - 1].y - y	
 				);
-				pair<i64, i64> expected{
-					x + angle_to_vec(rot - 1).first,
-					y + angle_to_vec(rot - 1).second
-				};
+				Vec2 expected(
+					x + angle_to_vec(rot - 1).x,
+					y + angle_to_vec(rot - 1).y
+				);
 				// Detect left or right turn
 				if (data->snake[i + 1] != expected) {
 					rot += 1;
@@ -138,11 +141,14 @@ void draw(const GameData *data) {
 			}
 		}
 
+		if (data->snake[i].isEating) {
+			texture += "_eating";
+		}
 		drawSprite(data, x, y, rot, texture);
 	}
 
 	for (auto p : data->food) {
-		drawSprite(data, p.first, p.second, 0, "food");
+		drawSprite(data, p.x, p.y, 0, "food");
 	}
 
 	window->display();
