@@ -98,7 +98,7 @@ void createWindow(const GameData *data) {
 	textures = new map<string, sf::Texture>();
 	loadAllTextures();
 
-	if (!font.loadFromFile("sfml/fonts/SigmarOne-Regular.ttf")) {
+	if (!font.loadFromFile("fonts/SigmarOne-Regular.ttf")) {
 		die("failed to load font");
 	}
 }

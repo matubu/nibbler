@@ -12,7 +12,7 @@ u64 currentTexturePack = 0;
 u64 nbFoodVariants = 5;
 
 void loadTexture(const string &name) {
-	string path = "sfml/assets/" + name + ".png";
+	string path = "assets/" + name + ".png";
 
 	if (!(*textures)[name].loadFromFile(path.c_str())) {
 		die("failed to load texture");

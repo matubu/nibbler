@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <map>
 
 #include "../GameData.hpp"
 
@@ -8,6 +9,20 @@ extern "C" {
 
 SDL_Window		*window = NULL;
 SDL_Renderer	*renderer = NULL;
+
+// Textures data
+std::map<std::string, SDL_Texture*>	*textures;
+vector<string> texturesPacks{"blue", "orange", "green"};
+u64 currentTexturePack = 0;
+u64 nbFoodVariants = 5;
+
+SDL_Texture*	loadTexture(std::string	path) {
+	SDL_Texture* newTexture = NULL;
+	SDL_Surface* loadedSurface = SDL_LoadBMP(path.c_str());
+	newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+	SDL_FreeSurface(loadedSurface);
+	return newTexture;
+}
 
 void createWindow(const GameData *data) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
