@@ -1,11 +1,14 @@
 Name=nibbler
 
+LIBFLAG = -lsfml-audio -L./sfml/lib
+CPPFLAGS = -O3 -I./sfml/include
+
 all:
 	make -C ./raylib
 	make -C ./sdl2
 	make -C ./sfml
-	g++ main.cpp -o $(Name)
-	./nibbler
+	g++ $(CPPFLAGS) main.cpp -o $(Name) $(LIBFLAG)
+	ALSOFT_LOGLEVEL=0 ./nibbler
 
 fclean:
 	rm -f ./raylib/libraylib.so

@@ -11,11 +11,6 @@ sf::RenderWindow *window = NULL;
 sf::Sprite *sprite;
 map<string, sf::Texture> *textures;
 
-void die(char *s) {
-	std::cerr << "Error: " << s << std::endl;
-	exit(1);
-}
-
 sf::Texture loadTexture(const string &path) {
 	sf::Texture tex;
 	if (!tex.loadFromFile(path.c_str())) {
@@ -90,6 +85,7 @@ pair<i64, i64> angle_to_vec(i64 angle) {
 		case 3:
 			return {-1, 0};
 	}
+	return {0, 0};
 }
 
 void draw(const GameData *data) {

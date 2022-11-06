@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+#include <SFML/Audio.hpp>
+
 #include "Event.hpp"
 
 using std::vector, std::pair, std::make_pair, std::string;
@@ -11,6 +13,11 @@ using std::vector, std::pair, std::make_pair, std::string;
 typedef uint64_t u64;
 typedef int64_t i64;
 typedef uint8_t byte;
+
+void die(char *s) {
+	std::cerr << "Error: " << s << std::endl;
+	exit(1);
+}
 
 bool contains(const vector<pair<i64, i64>> &vec, pair<i64, i64> pair) {
 	for (auto p : vec) {
@@ -33,6 +40,10 @@ struct GameData {
 	vector<pair<i64, i64>> food;
 	pair<i64, i64> direction;
 
+	sf::Music ambient_music_audio;
+	sf::Music apple_bit_audio;
+	sf::Music game_over_audio;
+
 	GameData(u64 width, u64 height) {
 		if (width < 4 || height < 4) {
 			throw "Width and height must be at least 4";
@@ -52,10 +63,21 @@ struct GameData {
 		this->spawnFood();
 
 		this->direction = make_pair(0, -1);
+
+		this->loadSound(this->ambient_music_audio, "./sounds/ambient_music.wav");
+		this->loadSound(this->apple_bit_audio, "./sounds/apple_bit.wav");
+		this->loadSound(this->game_over_audio, "./sounds/game_over.wav");
+		this->ambient_music_audio.setLoop(true);
+		this->ambient_music_audio.setVolume(50);
+		this->ambient_music_audio.play();
+	}
+
+	void loadSound(sf::Music &sound, string path) {
+		if (!sound.openFromFile(path))
+			die("failed to load sound");
 	}
 
 	void spawnFood() {
-		// TODO handle no space left on screen
 		while (1) {
 			pair<i64, i64> food = make_pair(rand() % width, rand() % height);
 			// Check if the food is not already on the snake
@@ -64,6 +86,12 @@ struct GameData {
 				break;
 			}
 		}
+	}
+
+	void setGameOver() {
+		this->gameOver = true;
+		this->ambient_music_audio.stop();
+		this->game_over_audio.play();
 	}
 
 	void updateSnake() {
@@ -76,13 +104,15 @@ struct GameData {
 
 		if (newX < 0 || newX >= this->width || newY < 0 || newY >= this->height
 			|| contains(this->snake, make_pair(newX, newY))) {
-			this->gameOver = true;
+			this->setGameOver();
 			return;
 		}
 
 		if (contains(this->food, make_pair(newX, newY))) {
 			this->food.erase(this->food.begin());
 			this->spawnFood();
+			this->apple_bit_audio.stop();
+			this->apple_bit_audio.play();
 		} else {
 			this->snake.pop_back();
 		}
