@@ -24,9 +24,7 @@ void createWindow(const GameData *data) {
 }
 
 void draw(const GameData *data) {
-	if (!window) {
-		return ;
-	}
+	if (!window) return ;
 	SDL_RenderClear(renderer);
 
 	

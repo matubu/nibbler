@@ -62,7 +62,6 @@ int main(int ac, char **av) {
 
 		if (clock() > nextUpdate) {
 			data.updateSnake(false);
-			// Not working
 			if (data.multiplayer)
 				data.updateSnake(true);
 			nextUpdate = clock() + CLOCKS_PER_SEC / data.speed;
