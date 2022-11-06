@@ -1,9 +1,9 @@
 #include <iostream>
 
 struct Audio {
-	void* audio;
+	void *audio;
 
-	Audio(std::string path);
+	Audio(const std::string &path);
 	void	play() const;
 	void	stop() const;
 	void	setLoop(bool loop) const;

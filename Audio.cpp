@@ -1,7 +1,7 @@
 #include "Audio.hpp"
 #include <SFML/Audio.hpp>
 
-Audio::Audio(std::string path) {
+Audio::Audio(const std::string &path) {
 	this->audio = new sf::Music();
 	if (!((sf::Music *)this->audio)->openFromFile(path)) {
 		std::cerr << "Error: " << "failed to load sound" << std::endl;
