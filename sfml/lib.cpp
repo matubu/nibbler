@@ -137,6 +137,7 @@ void draw_snake(const GameData *data, const Snake &snake) {
 		else if (part.isEating) {
 			texture += "_eating";
 		}
+		texture = texturesPacks[snake.score % texturesPacks.size()] + "/" + texture;
 		drawSprite(data, part.x, part.y, rot, texture);
 	}
 }
@@ -159,7 +160,6 @@ void draw(const GameData *data) {
 	text.setFont(font);
 	text.setString(data->getScoreText()
 		+ "\n[+/-] Speed: " + std::to_string(data->speed)
-		+ "\n[Tab] Theme: " + texturesPacks[currentTexturePack]
 	);
 	text.setCharacterSize(HELP_FONT_SIZE);
 	text.setFillColor(sf::Color::White);
@@ -195,7 +195,7 @@ void draw(const GameData *data) {
 	window->display();
 }
 
-vector<Event> getEvents(const GameData *data) {
+vector<Event> getEvents() {
 	if (!window) {
 		return vector<Event>();
 	}
@@ -215,28 +215,28 @@ vector<Event> getEvents(const GameData *data) {
 			case sf::Event::KeyPressed:
 				// Handle key presses
 				switch (event.key.code) {
-					case sf::Keyboard::Up:
-						events.push_back(Event(Event::ARR_UP));
-						break;
 					case sf::Keyboard::W:
-						events.push_back(Event(Event::UP));
-						break;
-					case sf::Keyboard::Down:
-						events.push_back(Event(Event::ARR_DOWN));
-						break;
-					case sf::Keyboard::S:
-						events.push_back(Event(Event::DOWN));
-						break;
-					case sf::Keyboard::Left:
-						events.push_back(Event(Event::ARR_LEFT));
+						events.push_back(Event(Event::W));
 						break;
 					case sf::Keyboard::A:
-						events.push_back(Event(Event::LEFT));
+						events.push_back(Event(Event::A));
 						break;
-					case sf::Keyboard::Right:
-						events.push_back(Event(Event::ARR_RIGHT));
+					case sf::Keyboard::S:
+						events.push_back(Event(Event::S));
 						break;
 					case sf::Keyboard::D:
+						events.push_back(Event(Event::D));
+						break;
+					case sf::Keyboard::Up:
+						events.push_back(Event(Event::UP));
+						break;
+					case sf::Keyboard::Left:
+						events.push_back(Event(Event::LEFT));
+						break;
+					case sf::Keyboard::Down:
+						events.push_back(Event(Event::DOWN));
+						break;
+					case sf::Keyboard::Right:
 						events.push_back(Event(Event::RIGHT));
 						break;
 					case sf::Keyboard::Add:
@@ -247,9 +247,6 @@ vector<Event> getEvents(const GameData *data) {
 						break;
 					case sf::Keyboard::R:
 						events.push_back(Event(Event::RESET));
-						break;
-					case sf::Keyboard::Tab:
-						currentTexturePack = (currentTexturePack + 1) % texturesPacks.size();
 						break;
 					case sf::Keyboard::Num1:
 						events.push_back(Event(Event::LIB1));

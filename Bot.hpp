@@ -100,13 +100,13 @@ void smartMove(const GameData *data, vector<Event> &events) {
 		lastPos = data->snake[0];
 
 		if (next.x > data->snake[0].x) {
-			events.push_back(Event::RIGHT);
+			events.push_back(Event::D);
 		} else if (next.x < data->snake[0].x) {
-			events.push_back(Event::LEFT);
+			events.push_back(Event::A);
 		} else if (next.y > data->snake[0].y) {
-			events.push_back(Event::DOWN);
+			events.push_back(Event::S);
 		} else if (next.y < data->snake[0].y) {
-			events.push_back(Event::UP);
+			events.push_back(Event::W);
 		}
 	}
 }

@@ -46,7 +46,7 @@ void draw(const GameData *data) {
 }
 
 // Collect all the events
-vector<Event> getEvents(const GameData *data) {
+vector<Event> getEvents() {
 	if (!window) {
 		return vector<Event>();
 	}
@@ -75,16 +75,16 @@ vector<Event> getEvents(const GameData *data) {
 						events.push_back(Event(Event::LIB3));
 						break;
 					case SDL_SCANCODE_UP:
-						events.push_back(Event(Event::UP));
+						events.push_back(Event(Event::W));
 						break;
 					case SDL_SCANCODE_LEFT:
-						events.push_back(Event(Event::LEFT));
+						events.push_back(Event(Event::A));
 						break;
 					case SDL_SCANCODE_DOWN:
-						events.push_back(Event(Event::DOWN));
+						events.push_back(Event(Event::S));
 						break;
 					case SDL_SCANCODE_RIGHT:
-						events.push_back(Event(Event::RIGHT));
+						events.push_back(Event(Event::D));
 						break;
 					case SDL_SCANCODE_ESCAPE:
 						events.push_back(Event(Event::QUIT));

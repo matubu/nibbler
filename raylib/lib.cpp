@@ -23,16 +23,16 @@ void draw(const GameData *data) {
 }
 
 // Collect all the events
-vector<Event> getEvents(const GameData *data) {
+vector<Event> getEvents() {
 	vector<Event> events;
 	if (IsKeyDown(KEY_RIGHT))
-		events.push_back(Event(Event::RIGHT));
+		events.push_back(Event(Event::D));
 	if (IsKeyDown(KEY_LEFT))
-		events.push_back(Event(Event::LEFT));
+		events.push_back(Event(Event::A));
 	if (IsKeyDown(KEY_UP))
-		events.push_back(Event(Event::UP));
+		events.push_back(Event(Event::W));
 	if (IsKeyDown(KEY_DOWN))
-		events.push_back(Event(Event::DOWN));
+		events.push_back(Event(Event::S));
 	if (IsKeyDown(KEY_ESCAPE))
 		events.push_back(Event(Event::QUIT));
 	if (IsKeyDown(KEY_ONE))

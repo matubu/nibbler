@@ -15,7 +15,7 @@ struct Lib {
 	typedef void (*draw_t)(const GameData *);
 	draw_t	draw;
 
-	typedef vector<Event> (*getEvents_t)(const GameData *data);
+	typedef vector<Event> (*getEvents_t)();
 	getEvents_t	getEvents;
 
 	typedef void (*closeWindow_t)();

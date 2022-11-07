@@ -7,7 +7,6 @@ using std::map;
 
 map<string, sf::Texture> *textures;
 vector<string> texturesPacks{"blue", "orange", "green"};
-u64 currentTexturePack = 0;
 
 u64 nbFoodVariants = 5;
 
@@ -26,11 +25,7 @@ void loadTextureFromPack(const string &name) {
 }
 
 const sf::Texture &getTexture(const string &name) {
-	auto it = textures->find(name);
-	if (it == textures->end()) {
-		it = textures->find(texturesPacks[currentTexturePack] + "/" + name);
-	}
-	return it->second;
+	return textures->find(name)->second;
 }
 
 const string getFoodTexture(i64 x, i64 y) {

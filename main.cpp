@@ -8,31 +8,31 @@ int main(int ac, char **av) {
 	int				nextUpdate = 0;
 
 	while (1) {
-		for (auto &event : lib.getEvents(&data)) {
+		for (auto &event : lib.getEvents()) {
 			// Handle event
 			switch (event.type) {
-				case Event::UP:
+				case Event::W:
 					data.changeDirection(0, Vec2(0, -1));
 					break;
-				case Event::DOWN:
+				case Event::S:
 					data.changeDirection(0, Vec2(0, 1));
 					break;
-				case Event::LEFT:
+				case Event::A:
 					data.changeDirection(0, Vec2(-1, 0));
 					break;
-				case Event::RIGHT:
+				case Event::D:
 					data.changeDirection(0, Vec2(1, 0));
 					break;
-				case Event::ARR_UP:
+				case Event::UP:
 					data.changeDirection(1, Vec2(0, -1));
 					break;
-				case Event::ARR_DOWN:
+				case Event::DOWN:
 					data.changeDirection(1, Vec2(0, 1));
 					break;
-				case Event::ARR_LEFT:
+				case Event::LEFT:
 					data.changeDirection(1, Vec2(-1, 0));
 					break;
-				case Event::ARR_RIGHT:
+				case Event::RIGHT:
 					data.changeDirection(1, Vec2(1, 0));
 					break;
 				case Event::SPEED_UP:

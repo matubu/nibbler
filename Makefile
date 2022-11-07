@@ -1,7 +1,7 @@
 Name=nibbler
 
 LIBFLAG = -lsfml-audio -L./sfml/lib
-CPPFLAGS = -std=c++17 -O3 -I./sfml/include
+CPPFLAGS = -Wall -Wextra -std=c++17 -O3 -I./sfml/include
 
 all:
 	make -C ./raylib

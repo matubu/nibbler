@@ -1,7 +1,7 @@
 # https://github-wiki-see.page/m/raysan5/raylib/wiki/Working-on-macOS
 # -Llib/ -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL 
 LIBFLAG =  -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL -L./raylib/src
-CPPFLAGS = -std=c++17 -fPIC -O3 -I./raylib/src
+CPPFLAGS = -Wall -Wextra -std=c++17 -fPIC -O3 -I./raylib/src
 
 all:
 	if [ "$(shell uname -s)" = "Darwin" ]; then \

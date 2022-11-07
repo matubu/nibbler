@@ -2,20 +2,16 @@
 
 struct Event {
 	enum EventType {
-		UP,
-		DOWN,
-		LEFT,
-		RIGHT,
-		ARR_UP,
-		ARR_DOWN,
-		ARR_LEFT,
-		ARR_RIGHT,
-		SPEED_UP,
-		SPEED_DOWN,
+		W, A, S, D,
+
+		UP, LEFT, DOWN, RIGHT,
+
+		SPEED_UP, SPEED_DOWN,
+
 		RESET,
-		LIB1,
-		LIB2,
-		LIB3,
+	
+		LIB1, LIB2, LIB3,
+
 		QUIT
 	};
 

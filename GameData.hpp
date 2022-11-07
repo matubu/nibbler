@@ -33,6 +33,10 @@ struct SnakePart: public Vec2 {
 };
 
 void	usage() {
+	// TODO
+	// --players WASD,BOT,ARROWS
+	// --server
+	// --connect <ip:port>
 	std::cout << "Usage:" << std::endl;
 	std::cout << "   ./nibbler <width> <height> [options]" << std::endl;
 	std::cout << "Options:" << std::endl;
@@ -60,8 +64,8 @@ struct Tiles {
 		}
 	}
 	bool isOutOfBounds(i64 x, i64 y) const {
-		return x < 0 || x >= tiles[0].size()
-			|| y < 0 || y >= tiles.size();
+		return x < 0 || (u64)x >= tiles[0].size()
+			|| y < 0 || (u64)y >= tiles.size();
 	}
 	const TileType &at(u64 x, u64 y) const {
 		return tiles[y][x];
@@ -75,6 +79,7 @@ struct Snake {
 	vector<SnakePart>	parts;
 	Vec2				direction;
 	bool				isDead;
+	u64					score;
 
 	// x and y from the center of the snake
 	Snake(u64 x, u64 y) {
@@ -84,6 +89,7 @@ struct Snake {
 		this->parts.push_back(SnakePart(x, y + 1));
 		this->direction = Vec2(0, -1);
 		this->isDead = false;
+		this->score = 0;
 	}
 
 	void die() {
@@ -103,7 +109,9 @@ struct Snake {
 		bool eat = tiles.at(newX, newY) == Tiles::FOOD;
 		this->parts.insert(this->parts.begin(), SnakePart(newX, newY, eat));
 
-		if (!eat) {
+		if (eat) {
+			++this->score;
+		} else {
 			this->parts.pop_back();
 		}
 		return eat;
@@ -128,8 +136,8 @@ struct Snake {
 };
 
 struct GameData {
-	static const u64 TILE_SIZE = 40;
-	static const u64 DEFAULT_SPEED = 15;
+	static const u64 TILE_SIZE = 30;
+	static const u64 DEFAULT_SPEED = 20;
 
 	u64 width;
 	u64 height;
@@ -310,7 +318,7 @@ struct GameData {
 			if (!first) {
 				text += " | ";
 			}
-			text += std::to_string(snake.size());
+			text += std::to_string(snake.score);
 			first = false;
 		}
 		return text;
