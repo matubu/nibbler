@@ -1,15 +1,12 @@
 #pragma once
 
-#include <stdint.h>
-#include <vector>
-#include <string>
 #include <iostream>
 
 #include "types.hpp"
+#include "Tiles.hpp"
+#include "Bot.hpp"
 #include "Event.hpp"
 #include "Audio.hpp"
-
-using std::vector, std::string;
 
 void die(const string &s) {
 	std::cerr << "\x1b[1;91merror\x1b[0m: " << s << std::endl;
@@ -48,48 +45,20 @@ void	usage() {
 	exit(0);
 }
 
-struct Tiles {
-	enum TileType {
-		EMPTY,
-		SNAKE,
-		FOOD
-	};
-	
-	vector<vector<TileType>> tiles;
-
-	Tiles(u64 width, u64 height) {
-		tiles.resize(height);
-		for (auto &row : tiles) {
-			row.resize(width);
-		}
-	}
-	bool isOutOfBounds(i64 x, i64 y) const {
-		return x < 0 || (u64)x >= tiles[0].size()
-			|| y < 0 || (u64)y >= tiles.size();
-	}
-	const TileType &at(u64 x, u64 y) const {
-		return tiles[y][x];
-	}
-	const TileType &at(Vec2 pos) const {
-		return at(pos.x, pos.y);
-	}
-};
-
 struct Snake {
 	vector<SnakePart>	parts;
 	Vec2				direction;
 	bool				isDead;
+	bool				isBot;
 	u64					score;
 
 	// x and y from the center of the snake
-	Snake(u64 x, u64 y) {
+	Snake(u64 x, u64 y, bool isBot = false): isDead(false), isBot(isBot), score(0) {
 		this->parts.push_back(SnakePart(x, y - 2));
 		this->parts.push_back(SnakePart(x, y - 1));
 		this->parts.push_back(SnakePart(x, y    ));
 		this->parts.push_back(SnakePart(x, y + 1));
 		this->direction = Vec2(0, -1);
-		this->isDead = false;
-		this->score = 0;
 	}
 
 	void die() {
@@ -98,15 +67,19 @@ struct Snake {
 
 	// Returns true if the snake has eaten
 	bool updateSnake(const Tiles &tiles) {
+		if (this->isBot) {
+			this->direction = Bot::getDirection(tiles, this->parts[0]);
+		}
+
 		i64 newX = this->parts[0].x + this->direction.x;
 		i64 newY = this->parts[0].y + this->direction.y;
 
-		if (tiles.isOutOfBounds(newX, newY) || tiles.at(newX, newY) == Tiles::SNAKE) {
+		if (tiles.isOutOfBounds(newX, newY) || tiles.at(newX, newY).type == TileType::SNAKE) {
 			this->die();
 			return false;
 		}
 
-		bool eat = tiles.at(newX, newY) == Tiles::FOOD;
+		bool eat = tiles.at(newX, newY).type == TileType::FOOD;
 		this->parts.insert(this->parts.begin(), SnakePart(newX, newY, eat));
 
 		if (eat) {
@@ -208,25 +181,13 @@ struct GameData {
 		}
 	}
 
-	Tiles getTiles() const {
-		Tiles tiles(this->width, this->height);
-
-		for (auto &snake : this->snakes) {
-			for (auto &part : snake) {
-				tiles.tiles[part.y][part.x] = Tiles::SNAKE;
-			}
-		}
-		tiles.tiles[this->food.y][this->food.x] = Tiles::FOOD;
-		return (tiles);
-	}
-
 	void reset() {
 		this->gameOver = false;
 
 		if (this->multiplayer) {
 			this->snakes = vector<Snake>({
 				Snake(this->width / 2 - 3, this->height / 2),
-				Snake(this->width / 2 + 3, this->height / 2),
+				Snake(this->width / 2 + 3, this->height / 2, true),
 			});
 		} else {
 			this->snakes = vector<Snake>({
@@ -240,13 +201,25 @@ struct GameData {
 		this->audioManager.play("music", 50.0f, true);
 	}
 
+	Tiles getTiles() const {
+		Tiles tiles(this->width, this->height);
+
+		for (auto &snake : this->snakes) {
+			for (u64 i = 0; i < snake.size(); i++) {
+				tiles.at(snake[i]) = Tile(TileType::SNAKE);
+			}
+		}
+		tiles.at(this->food) = Tile(TileType::FOOD);
+		return (tiles);
+	}
+
 	void spawnFood() {
 		Tiles tiles = this->getTiles();
 
 		while (1) {
 			Vec2 food(rand() % width, rand() % height);
 
-			if (tiles.at(food) == Tiles::SNAKE) {
+			if (tiles.at(food).type == TileType::SNAKE) {
 				continue ;
 			}
 			this->food = food;

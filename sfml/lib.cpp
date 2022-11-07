@@ -9,6 +9,8 @@ sf::Sprite *sprite;
 
 sf::Font font;
 
+bool rainbowMode = false;
+
 const u64 HELP_FONT_SIZE = 15;
 const u64 TEXT_FONT_SIZE = 24;
 const u64 TITLE_FONT_SIZE = 48;
@@ -137,7 +139,7 @@ void draw_snake(const GameData *data, const Snake &snake) {
 		else if (part.isEating) {
 			texture += "_eating";
 		}
-		texture = texturesPacks[snake.score % texturesPacks.size()] + "/" + texture;
+		texture = texturesPacks[(rainbowMode ? i : snake.score) % texturesPacks.size()] + "/" + texture;
 		drawSprite(data, part.x, part.y, rot, texture);
 	}
 }
@@ -215,6 +217,18 @@ vector<Event> getEvents() {
 			case sf::Event::KeyPressed:
 				// Handle key presses
 				switch (event.key.code) {
+					case sf::Keyboard::Up:
+						events.push_back(Event(Event::UP));
+						break;
+					case sf::Keyboard::Left:
+						events.push_back(Event(Event::LEFT));
+						break;
+					case sf::Keyboard::Down:
+						events.push_back(Event(Event::DOWN));
+						break;
+					case sf::Keyboard::Right:
+						events.push_back(Event(Event::RIGHT));
+						break;
 					case sf::Keyboard::W:
 						events.push_back(Event(Event::W));
 						break;
@@ -227,17 +241,8 @@ vector<Event> getEvents() {
 					case sf::Keyboard::D:
 						events.push_back(Event(Event::D));
 						break;
-					case sf::Keyboard::Up:
-						events.push_back(Event(Event::UP));
-						break;
-					case sf::Keyboard::Left:
-						events.push_back(Event(Event::LEFT));
-						break;
-					case sf::Keyboard::Down:
-						events.push_back(Event(Event::DOWN));
-						break;
-					case sf::Keyboard::Right:
-						events.push_back(Event(Event::RIGHT));
+					case sf::Keyboard::Space:
+						rainbowMode = !rainbowMode;
 						break;
 					case sf::Keyboard::Add:
 						events.push_back(Event(Event::SPEED_UP));

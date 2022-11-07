@@ -2,9 +2,9 @@
 
 struct Event {
 	enum EventType {
-		W, A, S, D,
-
 		UP, LEFT, DOWN, RIGHT,
+
+		W, A, S, D,
 
 		SPEED_UP, SPEED_DOWN,
 
