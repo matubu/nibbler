@@ -1,11 +1,18 @@
+#include <cmath>
 #include "Lib.hpp"
+
+u64 get_micro() {
+	timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
+}
 
 int main(int ac, char **av) {
 
 	GameData data(ac, av);
 	Lib lib(Lib::LIB1, &data);
 
-	int				nextUpdate = 0;
+	u64 nextUpdate = 0;
 
 	while (1) {
 		for (auto &event : lib.getEvents()) {
@@ -60,9 +67,11 @@ int main(int ac, char **av) {
 			}
 		}
 
-		if (clock() > nextUpdate) {
+		u64 now = get_micro();
+		if (now > nextUpdate) {
 			data.update();
-			nextUpdate = clock() + CLOCKS_PER_SEC / data.speed;
+			nextUpdate = now + (1000000 / data.speed) - (now - nextUpdate);
+			nextUpdate = fmax(nextUpdate, now);
 		}
 		lib.draw(&data);
 	}
