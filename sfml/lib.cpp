@@ -93,6 +93,8 @@ void createWindow(const GameData *data) {
 		sf::Style::Close
 	);
 
+	window->setVerticalSyncEnabled(true);
+
 	sprite = new sf::Sprite();
 	textures = new map<string, sf::Texture>();
 	loadAllTextures();
