@@ -84,7 +84,6 @@ Vec2 bfs(const GameData *data, const Vec2 &goal) {
 		bfs_add(data, goal, queue, parent, Vec2(pos.pos.x, pos.pos.y - 1), pos);
 	}
 
-	std::cout << "No solution" << std::endl;
 	return data->snake[0];
 }
 

@@ -2,15 +2,12 @@
 
 #include "../GameData.hpp"
 #include "textures.hpp"
-#include "bot.hpp"
 
 sf::RenderWindow *window = NULL;
 
 sf::Sprite *sprite;
 
 sf::Font font;
-
-bool useBot = false;
 
 const u64 HELP_FONT_SIZE = 15;
 const u64 TEXT_FONT_SIZE = 24;
@@ -103,45 +100,44 @@ void createWindow(const GameData *data) {
 	}
 }
 
-void draw_snake(const GameData *data, vector<SnakePart> snake, bool gameOver) {
-	for (int i = 0; i < snake.size(); i++) {
-		i64 x = snake[i].x;
-		i64 y = snake[i].y;
+void draw_snake(const GameData *data, const Snake &snake) {
+	for (u64 i = 0; i < snake.size(); i++) {
+		auto &part = snake[i];
 		i64 rot = 0;
 		string texture;
 
 		// Find the right texture and rotation
 		if (i == 0) {
-			rot = get_snake_tile_orientation(snake[i], snake[i + 1]);
+			rot = get_snake_tile_orientation(part, snake[i + 1]);
 			texture = "head";
 		} else if (i == snake.size() - 1) {
-			rot = get_snake_tile_orientation(snake[i - 1], snake[i]);
+			rot = get_snake_tile_orientation(snake[i - 1], part);
 			texture = "tail";
 		} else {
 			if (snake[i - 1].x == snake[i + 1].x
 				|| snake[i - 1].y == snake[i + 1].y) {
 				rot = get_snake_tile_orientation(
 					snake[i - 1],
-					snake[i]
+					part
 				);
 				texture = "body_straight";
 			} else {
 				rot = get_snake_tile_orientation(
 					snake[i - 1],
-					snake[i],
+					part,
 					snake[i + 1]
 				);
 				texture = "body_turn";
 			}
 		}
 
-		if (gameOver && texture == "head") {
+		if (snake.isDead && texture == "head") {
 			texture += "_dead";
 		}
-		else if (snake[i].isEating) {
+		else if (part.isEating) {
 			texture += "_eating";
 		}
-		drawSprite(data, x, y, rot, texture);
+		drawSprite(data, part.x, part.y, rot, texture);
 	}
 }
 
@@ -152,17 +148,16 @@ void draw(const GameData *data) {
 
 	window->clear(sf::Color(0x0E183D00));
 
-	draw_snake(data, data->snake, data->gameOver);
-	if (data->multiplayer)
-		draw_snake(data, data->snake2, data->gameOver);
+	for (auto &snake : data->snakes) {
+		draw_snake(data, snake);
+	}
 
 	drawSprite(data, data->food.x, data->food.y, 0,
 			getFoodTexture(data->food.x, data->food.y));
 
 	sf::Text text;
 	text.setFont(font);
-	text.setString("Score: " + std::to_string(data->snake.size())
-		+ (useBot ? "\n[B] Disable bot" : "\n[B] Enable bot")
+	text.setString(data->getScoreText()
 		+ "\n[+/-] Speed: " + std::to_string(data->speed)
 		+ "\n[Tab] Theme: " + texturesPacks[currentTexturePack]
 	);
@@ -244,9 +239,6 @@ vector<Event> getEvents(const GameData *data) {
 					case sf::Keyboard::D:
 						events.push_back(Event(Event::RIGHT));
 						break;
-					case sf::Keyboard::B:
-						useBot = !useBot;
-						break;
 					case sf::Keyboard::Add:
 						events.push_back(Event(Event::SPEED_UP));
 						break;
@@ -278,10 +270,6 @@ vector<Event> getEvents(const GameData *data) {
 					break;
 				break;
 		}
-	}
-
-	if (useBot) {
-		smartMove(data, events);
 	}
 
 	return events;

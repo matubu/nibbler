@@ -20,7 +20,7 @@ void loadTexture(const string &name) {
 }
 
 void loadTextureFromPack(const string &name) {
-	for (auto pack : texturesPacks) {
+	for (auto &pack : texturesPacks) {
 		loadTexture(pack + "/" + name);
 	}
 }

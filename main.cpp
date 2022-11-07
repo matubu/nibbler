@@ -8,32 +8,32 @@ int main(int ac, char **av) {
 	int				nextUpdate = 0;
 
 	while (1) {
-		for (auto event : lib.getEvents(&data)) {
+		for (auto &event : lib.getEvents(&data)) {
 			// Handle event
 			switch (event.type) {
 				case Event::UP:
-					data.changeDirection(0, -1, false);
+					data.changeDirection(0, Vec2(0, -1));
 					break;
 				case Event::DOWN:
-					data.changeDirection(0, 1, false);
+					data.changeDirection(0, Vec2(0, 1));
 					break;
 				case Event::LEFT:
-					data.changeDirection(-1, 0, false);
+					data.changeDirection(0, Vec2(-1, 0));
 					break;
 				case Event::RIGHT:
-					data.changeDirection(1, 0, false);
+					data.changeDirection(0, Vec2(1, 0));
 					break;
 				case Event::ARR_UP:
-					data.changeDirection(0, -1, true);
+					data.changeDirection(1, Vec2(0, -1));
 					break;
 				case Event::ARR_DOWN:
-					data.changeDirection(0, 1, true);
+					data.changeDirection(1, Vec2(0, 1));
 					break;
 				case Event::ARR_LEFT:
-					data.changeDirection(-1, 0, true);
+					data.changeDirection(1, Vec2(-1, 0));
 					break;
 				case Event::ARR_RIGHT:
-					data.changeDirection(1, 0, true);
+					data.changeDirection(1, Vec2(1, 0));
 					break;
 				case Event::SPEED_UP:
 					data.speed++;
@@ -61,9 +61,7 @@ int main(int ac, char **av) {
 		}
 
 		if (clock() > nextUpdate) {
-			data.updateSnake(false);
-			if (data.multiplayer)
-				data.updateSnake(true);
+			data.update();
 			nextUpdate = clock() + CLOCKS_PER_SEC / data.speed;
 		}
 		lib.draw(&data);
