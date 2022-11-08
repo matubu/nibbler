@@ -1,19 +1,30 @@
-Name=nibbler
+NAME=nibbler
 
 LIBFLAG = -lsfml-audio -L./sfml/lib
-CPPFLAGS = -Wall -Wextra -Werror -std=c++17 -O3 -I./sfml/include
-CPPFLAGS += -fsanitize=address -g
+CPPFLAGS = -Wall -Wextra -Werror -g -fsanitize=address -std=c++17 -O3 -I./sfml/include
 
-all:
+SRCS = main.cpp Audio.cpp
+OBJS = $(SRCS:.cpp=.o)
+
+${NAME}: ${OBJS}
+	make libs
+	g++ ${CPPFLAGS} ${OBJS} -o ${NAME} ${LIBFLAG}
+
+libs:
 	make -C ./raylib
 	make -C ./sdl2
 	make -C ./sfml
-	g++ $(CPPFLAGS) main.cpp Audio.cpp -o $(Name) $(LIBFLAG)
 
-fclean:
-	rm -f ./raylib/libraylib.so
-	rm -f ./sdl2/libsdl2.so
-	rm -f ./sfml/libsfml.so
-	rm -f $(Name)
+clean:
+	rm -f ${OBJS}
 
-re: fclean all
+fclean: clean
+	rm -f ./raylib/*.so
+	rm -f ./sdl2/*.so
+	rm -f ./sfml/*.so
+	rm -f ./raylib/*.o
+	rm -f ./sdl2/*.o
+	rm -f ./sfml/*.o
+	rm -f $(NAME)
+
+re: fclean ${NAME}

@@ -3,7 +3,12 @@
 LIBFLAG =  -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL -L./raylib/src
 CPPFLAGS = -Wall -Wextra -std=c++17 -fPIC -O3 -I./raylib/src
 
-all:
+NAME=libraylib.so
+
+SRCS = lib.cpp
+OBJS = $(SRCS:.cpp=.o)
+
+${NAME}: ${OBJS}
 	if [ "$(shell uname -s)" = "Darwin" ]; then \
-		g++ ${CPPFLAGS} -shared lib.cpp ./raylib/src/libraylib.a -o libraylib.so ${LIBFLAG}; \
-	fi
+		g++ ${CPPFLAGS} -shared ${OBJS} ./raylib/src/libraylib.a -o ${NAME} ${LIBFLAG}; \
+	fi	

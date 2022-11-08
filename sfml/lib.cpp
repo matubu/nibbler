@@ -11,9 +11,9 @@ sf::Font *font;
 
 bool rainbowMode = false;
 
-const u64 HELP_FONT_SIZE = 15;
-const u64 TEXT_FONT_SIZE = 24;
-const u64 TITLE_FONT_SIZE = 48;
+const u64 HELP_FONT_SIZE = 15 * 2;
+const u64 TEXT_FONT_SIZE = 24 * 2;
+const u64 TITLE_FONT_SIZE = 48 * 2;
 
 void drawSprite(const GameData *data, i64 x, i64 y, i64 rot, const string &path) {
 	const sf::Texture &tex = getTexture(path);

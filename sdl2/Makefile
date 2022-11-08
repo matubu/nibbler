@@ -3,5 +3,10 @@
 LIBFLAG = -lSDL2 -L./lib
 CPPFLAGS = -Wall -Wextra -std=c++17 -fPIC -O3 -I./include
 
-all:
-	g++ ${CPPFLAGS} -shared lib.cpp -o libsdl2.so ${LIBFLAG}
+SRCS = lib.cpp
+OBJS = $(SRCS:.cpp=.o)
+
+NAME = libsdl2.so
+
+$(NAME): $(OBJS)
+	g++ ${CPPFLAGS} -shared ${OBJS} -o ${NAME} ${LIBFLAG}
