@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dlfcn.h>
+#include <exception>
 
 #include "GameData.hpp"
 
@@ -35,8 +36,7 @@ struct Lib {
 	void *loadSym(string name) {
 		void *sym = dlsym(this->dl, name.c_str());
 		if (!sym) {
-			cerr << "Error: " << dlerror() << endl;
-			exit(1);
+			throw std::runtime_error(dlerror());
 		}
 		return sym;
 	}
@@ -46,8 +46,7 @@ struct Lib {
 		cerr << "Loading " << path << endl;
 		this->dl = dlopen(path.c_str(), RTLD_LAZY);
 		if (!this->dl) {
-			cerr << "Error: " << dlerror() << endl;
-			exit(1);
+			throw std::runtime_error(dlerror());
 		}
 		this->createWindow = (createWindow_t)this->loadSym("createWindow");
 		this->draw = (draw_t)this->loadSym("draw");
@@ -59,7 +58,9 @@ struct Lib {
 	void unload() {
 		// Unload the library
 		this->closeWindow();
-		dlclose(this->dl);
+		if (dlclose(this->dl) < 0) {
+			throw std::runtime_error(dlerror());
+		}
 		this->dl = NULL;
 		this->createWindow = NULL;
 		this->draw = NULL;

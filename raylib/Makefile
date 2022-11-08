@@ -9,6 +9,4 @@ SRCS = lib.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 ${NAME}: ${OBJS}
-	if [ "$(shell uname -s)" = "Darwin" ]; then \
-		g++ ${CPPFLAGS} -shared ${OBJS} ./raylib/src/libraylib.a -o ${NAME} ${LIBFLAG}; \
-	fi	
+	g++ ${CPPFLAGS} -shared ${OBJS} ./raylib/src/libraylib.a -o ${NAME} ${LIBFLAG};
