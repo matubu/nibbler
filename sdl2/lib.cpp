@@ -58,7 +58,7 @@ void draw_snake(const Snake &snake) {
 void draw(const GameData *data) {
 	if (!window || !renderer)
 		return ;
-    SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0);
+	SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
 	for (auto &snake : data->snakes) {

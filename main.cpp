@@ -57,7 +57,7 @@ int main(int ac, char **av) {
 				break;
 			case Event::QUIT:
 				lib.unload();
-				exit(0);
+				return (0);
 		}
 
 		u64 now = get_micro();

@@ -25,13 +25,13 @@ void draw_snake_and_food(const GameData *data, const Snake &snake) {
 		};
 		// Head
 		if (i == 0)
-            DrawRectangleRec(rec, Fade(RED, 0.5f));
+			DrawRectangleRec(rec, Fade(RED, 0.5f));
 		// Tail
 		else if (i == snake.size() - 1)
-            DrawRectangleRec(rec, Fade(GREEN, .8f));
+			DrawRectangleRec(rec, Fade(GREEN, .8f));
 		// Body
 		else
-            DrawRectangleRec(rec, Fade(GREEN, .5f));
+			DrawRectangleRec(rec, Fade(GREEN, .5f));
 	}
 	rec = {
 		(float)(data->food.x * Tile::TILE_SIZE),

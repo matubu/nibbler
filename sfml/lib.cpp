@@ -7,7 +7,7 @@ sf::RenderWindow *window = NULL;
 
 sf::Sprite *sprite;
 
-sf::Font font;
+sf::Font *font;
 
 bool rainbowMode = false;
 
@@ -99,7 +99,8 @@ void createWindow(const GameData *data) {
 	textures = new map<string, sf::Texture>();
 	loadAllTextures();
 
-	if (!font.loadFromFile("fonts/SigmarOne-Regular.ttf")) {
+	font = new sf::Font();
+	if (!font->loadFromFile("fonts/SigmarOne-Regular.ttf")) {
 		die("failed to load font");
 	}
 }
@@ -161,7 +162,7 @@ void draw(const GameData *data) {
 			getFoodTexture(data->food.x, data->food.y));
 
 	sf::Text text;
-	text.setFont(font);
+	text.setFont(*font);
 	text.setString(data->getScoreText()
 		+ "\n[+/-] Speed: " + std::to_string(data->speed)
 	);
@@ -273,6 +274,7 @@ void closeWindow() {
 
 	delete sprite;
 	delete textures;
+	delete font;
 }
 
 #ifdef __cplusplus
