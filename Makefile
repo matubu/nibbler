@@ -12,7 +12,7 @@ ${NAME}: ${OBJS}
 
 libs:
 	if [ "$(shell uname -s)" = "Darwin" ]; then \
-		make -C ./raylib \
+		make -C ./raylib; \
 	fi	
 	make -C ./sdl2
 	make -C ./sfml
