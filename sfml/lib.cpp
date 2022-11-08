@@ -27,8 +27,8 @@ void drawSprite(const GameData *data, i64 x, i64 y, i64 rot, const string &path)
 		((float)window->getSize().y / tex.getSize().y) / data->height
 	);
 	sprite->setPosition(
-		x * GameData::TILE_SIZE + GameData::TILE_SIZE / 2,
-		y * GameData::TILE_SIZE + GameData::TILE_SIZE / 2
+		(x * Tile::TILE_SIZE + Tile::TILE_SIZE / 2) * 2,
+		(y * Tile::TILE_SIZE + Tile::TILE_SIZE / 2) * 2
 	);
 	sprite->setRotation(rot * 90);
 	window->draw(*sprite);
@@ -86,8 +86,8 @@ extern "C" {
 void createWindow(const GameData *data) {
 	window = new sf::RenderWindow(
 		sf::VideoMode(
-			data->width * GameData::TILE_SIZE,
-			data->height * GameData::TILE_SIZE
+			data->width * Tile::TILE_SIZE * 2,
+			data->height * Tile::TILE_SIZE * 2
 		),
 		"Nibbler - SFML",
 		sf::Style::Close
@@ -199,12 +199,11 @@ void draw(const GameData *data) {
 	window->display();
 }
 
-vector<Event> getEvents() {
+i64 getEvents() {
 	if (!window) {
-		return vector<Event>();
+		return Event::QUIT;
 	}
 
-	vector<Event> events;
 	sf::Event event;
 
 	// Collect all the events
@@ -213,62 +212,45 @@ vector<Event> getEvents() {
 		switch (event.type)
 		{
 			case sf::Event::Closed:
-				events.push_back(Event(Event::QUIT));
-				break;
+				return Event::QUIT;
 
 			case sf::Event::KeyPressed:
 				// Handle key presses
 				switch (event.key.code) {
 					case sf::Keyboard::Up:
-						events.push_back(Event(Event::UP));
-						break;
+						return Event::UP;
 					case sf::Keyboard::Left:
-						events.push_back(Event(Event::LEFT));
-						break;
+						return Event::LEFT;
 					case sf::Keyboard::Down:
-						events.push_back(Event(Event::DOWN));
-						break;
+						return Event::DOWN;
 					case sf::Keyboard::Right:
-						events.push_back(Event(Event::RIGHT));
-						break;
+						return Event::RIGHT;
 					case sf::Keyboard::W:
-						events.push_back(Event(Event::W));
-						break;
+						return Event::W;
 					case sf::Keyboard::A:
-						events.push_back(Event(Event::A));
-						break;
+						return Event::A;
 					case sf::Keyboard::S:
-						events.push_back(Event(Event::S));
-						break;
+						return Event::S;
 					case sf::Keyboard::D:
-						events.push_back(Event(Event::D));
-						break;
+						return Event::D;
 					case sf::Keyboard::Space:
 						rainbowMode = !rainbowMode;
-						break;
 					case sf::Keyboard::Add:
-						events.push_back(Event(Event::SPEED_UP));
-						break;
+						return Event::SPEED_UP;
 					case sf::Keyboard::Subtract:
-						events.push_back(Event(Event::SPEED_DOWN));
-						break;
+						return Event::SPEED_DOWN;
 					case sf::Keyboard::R:
-						events.push_back(Event(Event::RESET));
-						break;
+						return Event::RESET;
 					case sf::Keyboard::Num1:
-						events.push_back(Event(Event::LIB1));
-						break;
+						return Event::LIB1;
 					case sf::Keyboard::Num2:
-						events.push_back(Event(Event::LIB2));
-						break;
+						return Event::LIB2;
 					case sf::Keyboard::Num3:
-						events.push_back(Event(Event::LIB3));
-						break;
+						return Event::LIB3;
 					case sf::Keyboard::Escape:
-						events.push_back(Event(Event::QUIT));
-						break;
+						return Event::QUIT;
 					default:
-						break;
+						break ;
 				}
 				default:
 					break;
@@ -276,7 +258,7 @@ vector<Event> getEvents() {
 		}
 	}
 
-	return events;
+	return -1;
 }
 
 void closeWindow() {

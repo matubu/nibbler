@@ -13,6 +13,12 @@ void die(const string &s) {
 	exit(1);
 }
 
+u64 get_micro() {
+	timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
+}
+
 struct SnakePart: public Vec2 {
 	bool isEating;
 
@@ -41,6 +47,7 @@ void	usage() {
 	std::cout << "   <height>             height in cell" << std::endl;
 	std::cout << "   --no-music           disable music" << std::endl;
 	std::cout << "   --multiplayer        enable multiplayer mode" << std::endl;
+	std::cout << "   --bot      		  enable bot mode" << std::endl;
 	std::cout << "   --speed <speed>      the speed at which the snakes move" << std::endl;
 	exit(0);
 }
@@ -109,20 +116,23 @@ struct Snake {
 };
 
 struct GameData {
-	static const u64 TILE_SIZE = 30;
 	static const u64 DEFAULT_SPEED = 20;
 
 	u64 width;
 	u64 height;
-	bool multiplayer;
+	bool multiplayer = false;
+	bool bot = false;
 	u64 speed;
 
-	bool gameOver;
-	vector<Snake> snakes;
+	bool			gameOver;
+	vector<Snake>	snakes;
 
-	Vec2 food;
+	Vec2	food;
 
 	AudioManager audioManager;
+
+	u64		resetRestrict = 0; 
+
 
 	GameData(int ac, char **av) {
 		this->parseOptions(ac, av);
@@ -160,6 +170,9 @@ struct GameData {
 			else if (option == "--multiplayer") {
 				this->multiplayer = true;
 			}
+			else if (option == "--bot") {
+				this->bot = true;
+			}
 			else if (option == "--speed") {
 				if (av[++i] == NULL) {
 					usage();
@@ -182,12 +195,19 @@ struct GameData {
 	}
 
 	void reset() {
+		// when you keep R pressed, it fires reset() to much
+		// so I apply 200 ms security
+		u64 now = get_micro() / 1000;
+		if (now > this->resetRestrict) {
+			this->resetRestrict = now + 200;
+		}
+		else return ;
 		this->gameOver = false;
 
-		if (this->multiplayer) {
+		if (this->multiplayer || this->bot) {
 			this->snakes = vector<Snake>({
 				Snake(this->width / 2 - 3, this->height / 2),
-				Snake(this->width / 2 + 3, this->height / 2, true),
+				Snake(this->width / 2 + 3, this->height / 2, this->bot),
 			});
 		} else {
 			this->snakes = vector<Snake>({

@@ -1,12 +1,6 @@
 #include <cmath>
 #include "Lib.hpp"
 
-u64 get_micro() {
-	timespec ts;
-	clock_gettime(CLOCK_MONOTONIC, &ts);
-	return ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
-}
-
 int main(int ac, char **av) {
 
 	GameData data(ac, av);
@@ -15,56 +9,55 @@ int main(int ac, char **av) {
 	u64 nextUpdate = 0;
 
 	while (1) {
-		for (auto &event : lib.getEvents()) {
-			// Handle event
-			switch (event.type) {
-				case Event::UP:
-					data.changeDirection(0, Vec2(0, -1));
-					break;
-				case Event::DOWN:
-					data.changeDirection(0, Vec2(0, 1));
-					break;
-				case Event::LEFT:
-					data.changeDirection(0, Vec2(-1, 0));
-					break;
-				case Event::RIGHT:
-					data.changeDirection(0, Vec2(1, 0));
-					break;
-				case Event::W:
-					data.changeDirection(1, Vec2(0, -1));
-					break;
-				case Event::S:
-					data.changeDirection(1, Vec2(0, 1));
-					break;
-				case Event::A:
-					data.changeDirection(1, Vec2(-1, 0));
-					break;
-				case Event::D:
-					data.changeDirection(1, Vec2(1, 0));
-					break;
-				case Event::SPEED_UP:
-					data.speed++;
-					break;
-				case Event::SPEED_DOWN:
-					if (data.speed > 1)
-						data.speed--;
-					break;
-				case Event::RESET:
-					data.reset();
-					break;
-				case Event::LIB1:
-					lib.switchLib(Lib::LIB1, &data);
-					break;
-				case Event::LIB2:
-					lib.switchLib(Lib::LIB2, &data);
-					break;
-				case Event::LIB3:
-					lib.switchLib(Lib::LIB3, &data);
-					break;
-				case Event::QUIT:
-					lib.unload();
-					exit(0);
-			}
+		i64 event = lib.getEvents();
+		// Handle event
+		switch (event) {
+			case Event::UP:
+				data.changeDirection(0, Vec2(0, -1));
+				break;
+			case Event::DOWN:
+				data.changeDirection(0, Vec2(0, 1));
+				break;
+			case Event::LEFT:
+				data.changeDirection(0, Vec2(-1, 0));
+				break;
+			case Event::RIGHT:
+				data.changeDirection(0, Vec2(1, 0));
+				break;
+			case Event::W:
+				data.changeDirection(1, Vec2(0, -1));
+				break;
+			case Event::S:
+				data.changeDirection(1, Vec2(0, 1));
+				break;
+			case Event::A:
+				data.changeDirection(1, Vec2(-1, 0));
+				break;
+			case Event::D:
+				data.changeDirection(1, Vec2(1, 0));
+				break;
+			case Event::SPEED_UP:
+				data.speed++;
+				break;
+			case Event::SPEED_DOWN:
+				if (data.speed > 1)
+					data.speed--;
+				break;
+			case Event::RESET:
+				data.reset();
+				break;
+			case Event::LIB1:
+				lib.switchLib(Lib::LIB1, &data);
+				break;
+			case Event::LIB2:
+				lib.switchLib(Lib::LIB2, &data);
+				break;
+			case Event::LIB3:
+				lib.switchLib(Lib::LIB3, &data);
+				break;
+			case Event::QUIT:
+				lib.unload();
+				exit(0);
 		}
 
 		u64 now = get_micro();
