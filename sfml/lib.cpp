@@ -235,6 +235,7 @@ i64 getEvents() {
 						return Event::D;
 					case sf::Keyboard::Space:
 						rainbowMode = !rainbowMode;
+						break ;
 					case sf::Keyboard::Add:
 						return Event::SPEED_UP;
 					case sf::Keyboard::Subtract:

@@ -1,42 +1,31 @@
 #include "Audio.hpp"
 #include <SFML/Audio.hpp>
 
-/** Audio */
-Audio::Audio(const std::string &name) {
-	std::string path = "sounds/" + name + ".wav";
-
-	this->audio = new sf::Music();
-
-	if (!((sf::Music *)this->audio)->openFromFile(path)) {
-		std::cerr << "Error: " << "failed to load sound" << std::endl;
-		exit(1);
-	}
-}
-
-void	Audio::play() const {
-	this->stop();
-	((sf::Music *)this->audio)->play();
-}
-
-void	Audio::stop() const {
-	((sf::Music *)this->audio)->stop();
-}
-
-void	Audio::setLoop(bool loop) const {
-	((sf::Music *)this->audio)->setLoop(loop);
-}
-
-void	Audio::setVolume(float volume) const {
-	((sf::Music *)this->audio)->setVolume(volume);
-}
-
 /** AudioManager **/
 AudioManager::AudioManager(float globalVolume) {
 	this->globalVolume = globalVolume;
 }
 
+AudioManager::~AudioManager() {
+	for (auto &audio: this->audios) {
+		delete ((sf::Music *)audio.second);
+	}
+}
+
 void	AudioManager::setGlobalVolume(float volume) {
 	this->globalVolume = volume;
+}
+
+void	*AudioManager::load_music(const std::string &name) {
+	std::string path = "sounds/" + name + ".wav";
+
+	sf::Music *audio = new sf::Music();
+	if (!audio->openFromFile(path)) {
+		std::cerr << "Error: " << "failed to load sound" << std::endl;
+		exit(1);
+	}
+
+	return audio;
 }
 
 void	AudioManager::play(const std::string &name, float volume, bool loop) {
@@ -46,11 +35,13 @@ void	AudioManager::play(const std::string &name, float volume, bool loop) {
 	}
 	auto it = this->audios.find(name);
 	if (it == this->audios.end()) {
-		it = this->audios.insert(std::make_pair(name, Audio(name))).first;
+		std::cout << "load music" << std::endl;
+		it = this->audios.insert(std::make_pair(name, this->load_music(name))).first;
 	}
-	it->second.setLoop(loop);
-	it->second.setVolume(volume);
-	it->second.play();
+	((sf::Music *)it->second)->stop();
+	((sf::Music *)it->second)->setLoop(loop);
+	((sf::Music *)it->second)->setVolume(volume);
+	((sf::Music *)it->second)->play();
 }
 
 void	AudioManager::stop(const std::string &name) const {
@@ -58,5 +49,5 @@ void	AudioManager::stop(const std::string &name) const {
 	if (it == this->audios.end()) {
 		return ;
 	}
-	it->second.stop();
+	((sf::Music *)it->second)->stop();
 }

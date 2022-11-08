@@ -2,6 +2,7 @@ Name=nibbler
 
 LIBFLAG = -lsfml-audio -L./sfml/lib
 CPPFLAGS = -Wall -Wextra -Werror -std=c++17 -O3 -I./sfml/include
+CPPFLAGS += -fsanitize=address -g
 
 all:
 	make -C ./raylib

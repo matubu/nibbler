@@ -131,7 +131,7 @@ struct GameData {
 
 	AudioManager audioManager;
 
-	u64		resetRestrict = 0; 
+	// u64		resetRestrict = 0; 
 
 
 	GameData(int ac, char **av) {
@@ -197,11 +197,11 @@ struct GameData {
 	void reset() {
 		// when you keep R pressed, it fires reset() to much
 		// so I apply 200 ms security
-		u64 now = get_micro() / 1000;
-		if (now > this->resetRestrict) {
-			this->resetRestrict = now + 200;
-		}
-		else return ;
+		// u64 now = get_micro() / 1000;
+		// if (now > this->resetRestrict) {
+		// 	this->resetRestrict = now + 200;
+		// }
+		// else return ;
 		this->gameOver = false;
 
 		if (this->multiplayer || this->bot) {
