@@ -204,14 +204,14 @@ struct GameData {
 		else return ;
 		this->gameOver = false;
 
-		if (this->multiplayer || this->bot) {
+		if (this->multiplayer) {
 			this->snakes = vector<Snake>({
 				Snake(this->width / 2 - 3, this->height / 2),
 				Snake(this->width / 2 + 3, this->height / 2, this->bot),
 			});
 		} else {
 			this->snakes = vector<Snake>({
-				Snake(this->width / 2, this->height / 2),
+				Snake(this->width / 2, this->height / 2, this->bot),
 			});
 		}
 

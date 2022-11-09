@@ -7,8 +7,9 @@ void	drawRect(i64 x, i64 y);
 void draw_snake(const Snake &snake);
 
 SDL_Color		grey = {132, 215, 117, 0};
-SDL_Color		green = {132, 237, 125, 0};
 SDL_Color		red = {242, 130, 106, 0};
+SDL_Color		green = {132, 237, 125, 0};
+SDL_Color		blue = {132, 135, 237, 0};
 
 class Library : virtual public ILibrary {
 	private:
@@ -49,7 +50,7 @@ class Library : virtual public ILibrary {
 			for (auto &snake : data->snakes) {
 				draw_snake(snake);
 			}
-			SDL_SetRenderDrawColor(this->renderer, red.r, red.g, red.b, red.a);
+			SDL_SetRenderDrawColor(this->renderer, blue.r, blue.g, blue.b, blue.a);
 			drawRect(data->food.x, data->food.y);
 			SDL_RenderPresent(this->renderer);
 		}

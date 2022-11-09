@@ -15,7 +15,7 @@ enum TileType {
 };
 
 struct Tile {
-	static const u64 TILE_SIZE = 30;
+	static const u64 TILE_SIZE = 10;
 	TileType type;
 
 	Tile(TileType type = TileType::EMPTY) : type(type) {}
@@ -30,6 +30,8 @@ struct Tiles {
 			row.resize(width);
 		}
 	}
+	Tiles(const Tiles &other) : tiles(other.tiles) {}
+
 	bool isOutOfBounds(i64 x, i64 y) const {
 		return x < 0 || (u64)x >= tiles[0].size()
 			|| y < 0 || (u64)y >= tiles.size();
@@ -50,3 +52,23 @@ struct Tiles {
 		return at(pos.x, pos.y);
 	}
 };
+
+std::ostream &operator<<(std::ostream &os, const Tiles &tiles) {
+	for (const auto &row : tiles.tiles) {
+		for (const auto &tile : row) {
+			switch (tile.type) {
+			case TileType::EMPTY:
+				os << '_';
+				break;
+			case TileType::SNAKE:
+				os << 'X';
+				break;
+			case TileType::FOOD:
+				os << 'O';
+				break;
+			}
+		}
+		os << std::endl;
+	}
+	return os;
+}

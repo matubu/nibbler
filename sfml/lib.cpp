@@ -35,8 +35,6 @@ class Library : virtual public ILibrary {
 				sf::Style::Close
 			);
 
-			this->window->setVerticalSyncEnabled(true);
-
 			this->sprite = new sf::Sprite();
 			textures = new map<string, sf::Texture>();
 			loadAllTextures();
