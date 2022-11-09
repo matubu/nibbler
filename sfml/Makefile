@@ -9,4 +9,5 @@ OBJS = $(SRCS:.cpp=.o)
 NAME = libsfml.so
 
 $(NAME): $(OBJS)
+	@echo "Compiling ${NAME}..."
 	g++ ${CPPFLAGS} -shared ${OBJS} -o ${NAME} ${LIBFLAG}

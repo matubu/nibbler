@@ -196,7 +196,7 @@ struct GameData {
 
 	void reset() {
 	// 	when you keep R pressed, it fires reset() to much
-	// 	so I apply 200 ms security
+	// 	so I apply 100 ms security
 		u64 now = get_micro() / 1000;
 		if (now > this->resetRestrict) {
 			this->resetRestrict = now + 100;

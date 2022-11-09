@@ -7,11 +7,12 @@ SRCS = main.cpp Audio.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 ${NAME}: ${OBJS}
-	make libs
+	@make libs
+	@echo "Compiling ${NAME}..."
 	g++ ${CPPFLAGS} ${OBJS} -o ${NAME} ${LIBFLAG}
 
 libs:
-	if [ "$(shell uname -s)" = "Darwin" ]; then \
+	@if [ "$(shell uname -s)" = "Darwin" ]; then \
 		make -C ./raylib; \
 	fi	
 	make -C ./sdl2

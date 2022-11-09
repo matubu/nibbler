@@ -9,4 +9,5 @@ SRCS = lib.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 ${NAME}: ${OBJS}
-	g++ ${CPPFLAGS} -shared ${OBJS} ./raylib/src/libraylib.a -o ${NAME} ${LIBFLAG};
+	@echo "Compiling ${NAME}..."
+	@g++ ${CPPFLAGS} -shared ${OBJS} ./raylib/src/libraylib.a -o ${NAME} ${LIBFLAG};
