@@ -1,7 +1,7 @@
 NAME=nibbler
 
 LIBFLAG = -lsfml-audio -L./sfml/lib
-CPPFLAGS = -Wall -Wextra -Werror -g -fsanitize=address -std=c++17 -O3 -I./sfml/include
+CPPFLAGS = -Wall -Wextra -Werror -std=c++17 -O3 -I./sfml/include
 
 SRCS = main.cpp Audio.cpp
 OBJS = $(SRCS:.cpp=.o)
@@ -11,7 +11,9 @@ ${NAME}: ${OBJS}
 	g++ ${CPPFLAGS} ${OBJS} -o ${NAME} ${LIBFLAG}
 
 libs:
-	make -C ./raylib
+	if [ "$(shell uname -s)" = "Darwin" ]; then \
+		make -C ./raylib; \
+	fi	
 	make -C ./sdl2
 	make -C ./sfml
 
