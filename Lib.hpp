@@ -2,7 +2,7 @@
 
 #include <dlfcn.h>
 
-#include "GameData.hpp"
+#include "ILibrary.hpp"
 
 using std::cerr, std::endl;
 

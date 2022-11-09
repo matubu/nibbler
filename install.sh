@@ -23,7 +23,3 @@ ln -sf $path/sfml/*/lib ./sfml/lib
 # SDL2 links
 ln -sf $path/sdl2/*/include ./sdl2/include
 ln -sf $path/sdl2/*/lib ./sdl2/lib
-
-make -C ./raylib
-make -C ./sdl2
-make -C ./sfml
