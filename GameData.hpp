@@ -224,12 +224,12 @@ struct GameData {
 	Tiles getTiles() const {
 		Tiles tiles(this->width, this->height);
 
+		tiles.at(this->food) = Tile(TileType::FOOD);
 		for (auto &snake : this->snakes) {
 			for (u64 i = 0; i < snake.size(); i++) {
 				tiles.at(snake[i]) = Tile(TileType::SNAKE);
 			}
 		}
-		tiles.at(this->food) = Tile(TileType::FOOD);
 		return (tiles);
 	}
 
