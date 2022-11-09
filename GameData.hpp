@@ -215,7 +215,6 @@ struct GameData {
 			});
 		}
 
-		srand(time(NULL) + clock());
 		this->spawnFood();
 
 		this->audioManager.play("music", 50.0f, true);
@@ -236,6 +235,7 @@ struct GameData {
 	void spawnFood() {
 		Tiles tiles = this->getTiles();
 
+		srand(time(NULL) + clock());
 		while (1) {
 			Vec2 food(rand() % width, rand() % height);
 
