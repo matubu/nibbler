@@ -39,19 +39,15 @@ namespace Bot {
 		const BfsNode &parentNode
 	) {
 		if (tiles.isOutOfBounds(pos)) {
-			// std::cout << "Out of bounds: " << pos.x << " " << pos.y << std::endl;
 			return ;
 		}
 
-		// TODO calculate in how many turn the snake will be out of this position
 		if (tiles.at(pos).type == TileType::SNAKE) {
-			// std::cout << "Snake at " << pos.x << " " << pos.y << std::endl;
 			return ;
 		}
 
 		auto currParentIt = parent.find(pos);
 		if (currParentIt != parent.end() && parentNode.depth >= currParentIt->second.depth) {
-			// std::cout << "Already visited" << std::endl;
 			return ;
 		}
 
@@ -173,10 +169,6 @@ namespace Bot {
 				best_dist = dist;
 				best_danger = danger;
 			}
-		}
-
-		if (best_danger) {
-			std::cout << rand() << " ***TOOK A DANGEROUS PATH***" << std::endl;
 		}
 
 		return Vec2(next.x - start.x, next.y - start.y);

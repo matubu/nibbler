@@ -15,7 +15,7 @@ enum TileType {
 };
 
 struct Tile {
-	static const u64 TILE_SIZE = 10;
+	static const u64 TILE_SIZE = 30;
 	TileType type;
 
 	Tile(TileType type = TileType::EMPTY) : type(type) {}
