@@ -6,6 +6,6 @@
 ![](./screenshots/gameover.png)
 
 ## Contributors
-Code: [@Edracoon](https://github.com/Edracoon) & [@matubu](https://github.com/matubu)
-Graphical assets: [@matubu](https://github.com/matubu)
-Music: [@dsamain](https://github.com/dsamain)
+ - Code: [@Edracoon](https://github.com/Edracoon) & [@matubu](https://github.com/matubu)
+ - Graphical assets: [@matubu](https://github.com/matubu)
+ - Music: [@dsamain](https://github.com/dsamain)
