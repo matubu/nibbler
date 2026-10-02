@@ -21,9 +21,8 @@ The web version is deployed as Cloudflare Worker static assets at
 [snake.mathias.ninja](https://snake.mathias.ninja). The custom domain is configured in
 `wrangler.jsonc` and serves the build output from `web/dist`.
 
-Cloudflare Workers Builds watches the `main` branch and deploys every new commit.
-Its build command is `npm --prefix web ci && npm --prefix web run build` and its deploy command is
-`web/node_modules/.bin/wrangler deploy --config wrangler.jsonc`.
+Cloudflare Workers Builds watches the `main` branch and deploys every new commit with
+`npx wrangler deploy`, which builds the web app first (`build.command` in `wrangler.jsonc`).
 
 ## Contributors
  - Code: [@Edracoon](https://github.com/Edracoon) & [@matubu](https://github.com/matubu)
