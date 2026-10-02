@@ -1,13 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { stop } from './lib/audio'
+  import type { Control } from './lib/config'
   import type { Game } from './lib/game.svelte'
   import { TILE_SIZE } from './lib/grid'
   import { foodTexture, snakeSprites, TEXTURES, type Sprite } from './lib/sprites'
 
-  let { game }: { game: Game } = $props()
+  let { game, onquit }: { game: Game; onquit: () => void } = $props()
 
-  // Same sizes as the SFML window, in points (it renders them at 2x on retina screens)
-  const HELP_FONT_SIZE = 15
+  // In points, the SFML window uses 15 / 24 / 48 (rendered at 2x on retina screens)
+  const HELP_FONT_SIZE = 20
+  const HUD_INSET = 24
   const TEXT_FONT_SIZE = 24
   const TITLE_FONT_SIZE = 48
 
@@ -23,31 +26,30 @@
 
   const gridWidth = $derived(game.width * TILE_SIZE)
   const gridHeight = $derived(game.height * TILE_SIZE)
-  // Only grids forced bigger than the screen through the URL get scaled down
+  // Only screens smaller than the minimum grid get it scaled down
   const scale = $derived(Math.min(1, innerWidth / gridWidth, innerHeight / gridHeight))
   const screenWidth = $derived(innerWidth / scale)
   const screenHeight = $derived(innerHeight / scale)
 
   let rainbowMode = $state(false)
 
-  const move = (snakeId: number, x: number, y: number) => game.changeDirection(snakeId, { x, y })
-  // WASD drives the second player, or the first one when there is no other human
-  const wasd = $derived(game.config.multiplayer && !game.config.bot ? 1 : 0)
+  const move = (control: Control, x: number, y: number) => game.changeDirection(control, { x, y })
 
   // Matched on KeyboardEvent.code (physical key, so WASD is ZQSD on AZERTY), then on KeyboardEvent.key
   const shortcuts: Record<string, () => void> = {
-    ArrowUp: () => move(0, 0, -1),
-    ArrowDown: () => move(0, 0, 1),
-    ArrowLeft: () => move(0, -1, 0),
-    ArrowRight: () => move(0, 1, 0),
-    KeyW: () => move(wasd, 0, -1),
-    KeyS: () => move(wasd, 0, 1),
-    KeyA: () => move(wasd, -1, 0),
-    KeyD: () => move(wasd, 1, 0),
+    ArrowUp: () => move('arrows', 0, -1),
+    ArrowDown: () => move('arrows', 0, 1),
+    ArrowLeft: () => move('arrows', -1, 0),
+    ArrowRight: () => move('arrows', 1, 0),
+    KeyW: () => move('wasd', 0, -1),
+    KeyS: () => move('wasd', 0, 1),
+    KeyA: () => move('wasd', -1, 0),
+    KeyD: () => move('wasd', 1, 0),
     Space: () => (rainbowMode = !rainbowMode),
     '+': () => game.speedUp(),
     '-': () => game.speedDown(),
     r: () => game.reset(),
+    Escape: () => onquit(),
   }
 
   function onkeydown(event: KeyboardEvent) {
@@ -99,7 +101,10 @@
         frame = requestAnimationFrame(loop)
       })
     })
-    return () => cancelAnimationFrame(frame)
+    return () => {
+      cancelAnimationFrame(frame)
+      stop('music')
+    }
   })
 </script>
 
@@ -140,7 +145,15 @@
       style:height="{gridHeight}px"
     ></canvas>
 
-    {@render text(`${game.scoreText}\n[+/-] Speed: ${game.speed}`, 5, HELP_FONT_SIZE, 'left-[7.5px]')}
+    <p
+      class="absolute opacity-60"
+      style:left="{HUD_INSET}px"
+      style:top="{HUD_INSET}px"
+      style:font-size="{HELP_FONT_SIZE}px"
+      style:line-height={LINE_HEIGHT}
+    >
+      {game.scoreText}<br />[+/-] Speed: {game.speed}
+    </p>
 
     {#if game.gameOver}
       <img src="/assets/death_overlay.png" alt="" class="absolute inset-0 size-full" />

@@ -1,6 +1,6 @@
 import { play, setAudioEnabled, stop } from './audio'
 import { botDirection } from './bot'
-import type { Config } from './config'
+import type { Config, Control } from './config'
 import { Grid, Tile, tilesIn, type Vec2 } from './grid'
 
 export type SnakePart = Vec2 & { isEating: boolean }
@@ -13,18 +13,18 @@ export class Snake {
   isDead = $state(false)
   score = $state(0)
   direction: Vec2 = { x: 0, y: -1 }
-  isBot: boolean
+  control: Control
 
   // x and y from the center of the snake
-  constructor(x: number, y: number, isBot = false) {
+  constructor(x: number, y: number, control: Control) {
     this.parts = [-2, -1, 0, 1].map((dy) => ({ x, y: y + dy, isEating: false }))
-    this.isBot = isBot
+    this.control = control
   }
 
   // Returns true if the snake has eaten
-  update(grid: Grid) {
-    if (this.isBot) {
-      this.direction = botDirection(grid, this.parts[0])
+  update(grid: Grid, snakes: Snake[], food: Vec2) {
+    if (this.control === 'bot') {
+      this.direction = botDirection(grid, snakes, this, food)
     }
 
     const pos = { x: this.parts[0].x + this.direction.x, y: this.parts[0].y + this.direction.y }
@@ -66,11 +66,11 @@ export class Game {
     this.reset()
   }
 
-  // Resize the grid to fill the viewport, unless its size was set in the URL.
+  // Resize the grid to fill the viewport.
   // The game goes on: snakes left outside die on their next move.
   fit(viewportWidth: number, viewportHeight: number) {
-    this.width = this.config.width ?? tilesIn(viewportWidth)
-    this.height = this.config.height ?? tilesIn(viewportHeight)
+    this.width = tilesIn(viewportWidth)
+    this.height = tilesIn(viewportHeight)
     if (this.food.x >= this.width || this.food.y >= this.height) {
       this.spawnFood()
     }
@@ -85,12 +85,18 @@ export class Game {
     if (now < this.#nextReset) return
     this.#nextReset = now + RESET_COOLDOWN_MS
 
-    const x = Math.floor(this.width / 2)
-    const y = Math.floor(this.height / 2)
+    // Snakes spread evenly in rows, with at least one free column between them
+    const controls = this.config.players
+    const perRow = Math.min(controls.length, Math.floor(this.width / 2))
+    const rows = Math.ceil(controls.length / perRow)
+    const spread = (i: number, count: number, length: number) => Math.floor((length * (i + 1)) / (count + 1))
 
     this.gameOver = false
-    const { multiplayer, bot } = this.config
-    this.snakes = multiplayer ? [new Snake(x - 3, y), new Snake(x + 3, y, bot)] : [new Snake(x, y, bot)]
+    this.snakes = controls.map((control, i) => {
+      const row = Math.floor(i / perRow)
+      const inRow = Math.min(perRow, controls.length - row * perRow)
+      return new Snake(spread(i % perRow, inRow, this.width), spread(row, rows, this.height), control)
+    })
     this.spawnFood()
     play('music', true)
   }
@@ -128,7 +134,7 @@ export class Game {
     for (const snake of this.snakes) {
       if (snake.isDead) continue
 
-      if (snake.update(this.grid())) {
+      if (snake.update(this.grid(), this.snakes, this.food)) {
         this.spawnFood()
         play('eat')
       }
@@ -146,13 +152,14 @@ export class Game {
     }
   }
 
-  changeDirection(snakeId: number, direction: Vec2) {
-    const snake = this.snakes[snakeId]
-    if (!snake) return
-
-    const [head, neck] = snake.parts
-    if (head.x + direction.x === neck.x && head.y + direction.y === neck.y) return
-    snake.direction = direction
+  // Turn every snake driven by these keys, unless it would go back into its neck
+  changeDirection(control: Control, direction: Vec2) {
+    for (const snake of this.snakes) {
+      if (snake.control !== control) continue
+      const [head, neck] = snake.parts
+      if (head.x + direction.x === neck.x && head.y + direction.y === neck.y) continue
+      snake.direction = direction
+    }
   }
 
   speedUp() {

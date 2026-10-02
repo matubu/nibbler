@@ -1,5 +1,5 @@
-// In points, the SFML window renders tiles at 2x on retina screens
-export const TILE_SIZE = 30
+// In points, a bit bigger than the SFML window's 30 to suit the browser
+export const TILE_SIZE = 40
 
 // Number of tiles fitting in a length in points, within the native game limits
 export const tilesIn = (length: number) => Math.min(255, Math.max(10, Math.floor(length / TILE_SIZE)))

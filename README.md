@@ -13,7 +13,7 @@ A standalone Svelte + Vite + Tailwind port lives in [`web/`](./web):
 cd web && npm install && npm run dev
 ```
 
-The grid fills the window by default. Options are passed in the URL, e.g. `/?width=30&height=20&multiplayer&bot&speed=10&no-music`.
+The grid fills the window. A start menu sets up to 25 players (arrows, WASD or bot), the speed and music, and remembers them; Esc goes back to it.
 
 ### Deployment
 

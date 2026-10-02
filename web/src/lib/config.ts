@@ -1,47 +1,46 @@
+export const CONTROLS = ['arrows', 'wasd', 'bot', 'off'] as const
+export type Control = (typeof CONTROLS)[number]
+
+export const MAX_PLAYERS = 25
+export const MAX_SPEED = 60
+
 export type Config = {
-  // null: fit the screen
-  width: number | null
-  height: number | null
-  multiplayer: boolean
-  bot: boolean
+  // One snake per entry, never 'off'
+  players: Control[]
   speed: number
   music: boolean
 }
 
-export const DEFAULT_SPEED = 20
+const STORAGE_KEY = 'nibbler-config'
 
-export const USAGE = `Usage:
-   /?width=<width>&height=<height>[&options]
-Options:
-   width=<n>       width in cell (default: fit the screen)
-   height=<n>      height in cell (default: fit the screen)
-   no-music        disable music
-   multiplayer     enable multiplayer mode
-   bot             enable bot mode
-   speed=<n>       the speed at which the snakes move`
+const defaultConfig = (): Config => ({
+  players: ['arrows'],
+  speed: 20,
+  music: true,
+})
 
-// The URL query string replaces the native command line arguments
-export function parseConfig(search: string): Config {
-  const params = new URLSearchParams(search)
-  const size = (name: string) => (params.has(name) ? Number(params.get(name)) : null)
-  const width = size('width')
-  const height = size('height')
-  const speed = Number(params.get('speed') ?? DEFAULT_SPEED)
-
-  const isSize = (n: number | null) => n === null || (Number.isInteger(n) && n >= 10 && n < 256)
-  if (!isSize(width) || !isSize(height)) {
-    throw new Error('width and height must be >=10 and <256')
+// The last options picked in the start menu, remembered across visits
+export function loadConfig(): Config {
+  const config = defaultConfig()
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}')
+    const { players, speed, music } = saved
+    if (
+      Array.isArray(players) &&
+      players.length > 0 &&
+      players.length <= MAX_PLAYERS &&
+      players.every((control) => control !== 'off' && CONTROLS.includes(control))
+    ) {
+      config.players = players
+    }
+    if (Number.isInteger(speed) && speed >= 1 && speed <= MAX_SPEED) config.speed = speed
+    if (typeof music === 'boolean') config.music = music
+  } catch {
+    // Keep the defaults
   }
-  if (!Number.isInteger(speed) || speed < 1) {
-    throw new Error('speed must be a valid integer greater than 0')
-  }
+  return config
+}
 
-  return {
-    width,
-    height,
-    speed,
-    multiplayer: params.has('multiplayer'),
-    bot: params.has('bot'),
-    music: !params.has('no-music'),
-  }
+export function saveConfig(config: Config) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(config))
 }
