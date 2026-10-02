@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'Sigmar One';
+  src: url('/fonts/SigmarOne-Regular.ttf') format('truetype');
+  font-display: block;
+}
+
+@theme {
+  --font-sigmar: 'Sigmar One', sans-serif;
+}

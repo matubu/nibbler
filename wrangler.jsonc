@@ -1,0 +1,11 @@
+{
+	"$schema": "./web/node_modules/wrangler/config-schema.json",
+	"name": "snake",
+	"compatibility_date": "2026-10-01",
+	// The custom domain is provisioned by wrangler on deploy (the mathias.ninja zone is on Cloudflare)
+	"routes": [{ "pattern": "snake.mathias.ninja", "custom_domain": true }],
+	"assets": {
+		"directory": "./web/dist",
+		"not_found_handling": "single-page-application"
+	}
+}

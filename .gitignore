@@ -3,3 +3,4 @@
 nibbler
 .vscode
 raylib/raylib/*
+.wrangler
